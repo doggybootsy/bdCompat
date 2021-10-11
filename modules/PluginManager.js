@@ -2,8 +2,8 @@ const { webFrame } = require('electron')
 const { join } = require('path')
 const { Module } = require('module')
 const { existsSync, readdirSync, unlinkSync } = require('fs')
-const { getModule, FluxDispatcher } = require('powercord/webpack')
-const { inject, uninject } = require('powercord/injector')
+const { getModule, FluxDispatcher } = require('@vizality/webpack')
+const { patch, unpatch } = require('@vizality/patcher')
 
 // Allow loading from discords node_modules
 Module.globalPaths.push(join(process.resourcesPath, 'app.asar/node_modules'))
@@ -32,7 +32,7 @@ module.exports = class BDPluginManager {
           window.$ = window.jQuery
         }
 
-        const ConnectionStore = await getModule(['isTryingToConnect', 'isConnected'])
+        const ConnectionStore = await getModule('isTryingToConnect', 'isConnected')
         const listener = () => {
           if (!ConnectionStore.isConnected()) return
           ConnectionStore.removeChangeListener(listener)
@@ -128,13 +128,14 @@ module.exports = class BDPluginManager {
 
     window.BdApi.saveData('BDCompat-EnabledPlugins', plugin.plugin.getName(), true)
     this.startPlugin(pluginName)
+    BdApi.showToast(`Started ${pluginName}`, {type: "success"})
   }
   disablePlugin (pluginName) {
     const plugin = window.bdplugins[pluginName]
     if (!plugin) return this.__error(null, `Tried to disable a missing plugin: ${pluginName}`)
-
     window.BdApi.saveData('BDCompat-EnabledPlugins', plugin.plugin.getName(), false)
     this.stopPlugin(pluginName)
+    BdApi.showToast(`Disabled ${pluginName}`, {type: "success"})
   }
 
   loadAllPlugins() {
@@ -217,12 +218,12 @@ module.exports = class BDPluginManager {
     if (!window?.ZLibrary?.Patcher) return this.__error(null, 'Failed to patch ZLibrary Patcher')
 
     const origFunction = Function
-    inject('bdCompat-zlib-patcher-pre', window.ZLibrary.Patcher, 'pushChildPatch', args => {
+    patch('bdCompat-zlib-patcher-pre', window.ZLibrary.Patcher, 'pushChildPatch', args => {
       const orig = args[1]?.[args[2]]
       if (orig && !(orig instanceof origFunction) && orig instanceof _window.Function) window.Function = _window.Function
       return args
     }, true)
-    inject('bdCompat-zlib-patcher', window.ZLibrary.Patcher, 'pushChildPatch', (_, res) => {
+    patch('bdCompat-zlib-patcher', window.ZLibrary.Patcher, 'pushChildPatch', (_, res) => {
       window.Function = origFunction
       return res
     })
@@ -230,8 +231,8 @@ module.exports = class BDPluginManager {
     this.__log('Patched ZLibrary Patcher')
   }
   __unpatchZLibPatcher() {
-    uninject('bdCompat-zlib-patcher-pre')
-    uninject('bdCompat-zlib-patcher')
+    unpatch('bdCompat-zlib-patcher-pre')
+    unpatch('bdCompat-zlib-patcher')
   }
 
 

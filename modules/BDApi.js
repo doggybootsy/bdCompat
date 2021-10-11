@@ -1,12 +1,10 @@
-'use strict'
-
 const path = require('path')
 const fs = require('fs')
 const crypto = require('crypto')
 
-const { getModule, getAllModules, getModuleByDisplayName, React, ReactDOM } = require('powercord/webpack')
-const { getOwnerInstance, getReactInstance } = require('powercord/util')
-const { inject, uninject } = require('powercord/injector')
+const { getModule, getAllModules, getModuleByDisplayName, React, ReactDOM } = require('@vizality/webpack')
+const { getOwnerInstance, getReactInstance } = require('@vizality/util').react
+const { patch, unpatch } = require('@vizality/patcher')
 
 const PluginData = {}
 
@@ -187,19 +185,31 @@ class BdApi {
     return BdApi.showConfirmationModal(title, children, { cancelText: null })
   }
 
-  static async showConfirmationModal(title, children, options = {}) {
-    const { onConfirm = () => {}, onCancel = () => {}, confirmText = 'Okay', cancelText = 'Cancel', danger = false, key } = options
+  static async showConfirmationModal(title, content, options = {}) {
+    const Markdown = BdApi.findModuleByDisplayName("Markdown")
+    const ConfirmationModal = BdApi.findModuleByDisplayName("ConfirmModal")
+    const ModalActions = BdApi.findModuleByProps("openModal")
+    const Buttons = BdApi.findModuleByProps("ButtonColors")
+    const {Messages} = BdApi.findModuleByProps("Messages")
+    if (!ModalActions || !ConfirmationModal || !Markdown) return this.default(title, content);
 
-    const { openModal } = await getModule(['openModal', 'updateModal'])
-    const Markdown = await getModuleByDisplayName('Markdown')
-    const ConfirmModal = await getModuleByDisplayName('ConfirmModal')
+    const emptyFunction = () => {};
+    const {onConfirm = emptyFunction, onCancel = emptyFunction, confirmText = Messages.OKAY, cancelText = Messages.CANCEL, danger = false, key = undefined} = options;
 
-    if (!Array.isArray(children)) children = [ children ]
-    children = children.map(c => typeof c == 'string' ? React.createElement(Markdown, null, c) : c)
-    return openModal(props => React.createElement(ConfirmModal, {
-      header: title, red: danger, confirmText, cancelText, onConfirm, onCancel, ...props
-    }, children), { modalKey: key })
-  }
+    if (!Array.isArray(content)) content = [content];
+    content = content.map(c => typeof(c) === "string" ? React.createElement(Markdown, null, c) : c);
+
+    return ModalActions.openModal(props => {
+        return React.createElement(ConfirmationModal, Object.assign({
+            header: title,
+            confirmButtonColor: danger ? Buttons.ButtonColors.RED : Buttons.ButtonColors.BRAND,
+            confirmText: confirmText,
+            cancelText: cancelText,
+            onConfirm: onConfirm,
+            onCancel: onCancel
+        }, props), content);
+    }, {modalKey: key});
+}
 
   static showToast (content, options = {}) {
     const { type = '', icon = true, timeout = 3000 } = options
@@ -363,10 +373,10 @@ class BdApi {
 
     const cancelPatch = () => {
       if (!data.options.silent) BdApi.__log(`Unpatching before of ${data.displayName} ${data.methodName}`)
-      uninject(patchID)
+      unpatch(patchID)
     }
 
-    inject(patchID, data.what, data.methodName, function beforePatch (args, res) {
+    patch(patchID, data.what, data.methodName, function beforePatch (args, res) {
       const patchData = {
         // eslint-disable-next-line no-invalid-this
         thisObject: this,
@@ -396,7 +406,7 @@ class BdApi {
 
     const cancelPatch = () => {
       if (!data.options.silent) BdApi.__log(`Unpatching after of ${data.displayName} ${data.methodName}`)
-      uninject(patchID)
+      unpatch(patchID)
     }
 
     inject(patchID, data.what, data.methodName, function afterPatch (args, res) {

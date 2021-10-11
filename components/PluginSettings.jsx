@@ -1,15 +1,14 @@
-const { React, getModuleByDisplayName } = require('powercord/webpack')
-const { Modal } = require('powercord/components/modal')
-const { close: closeModal } = require('powercord/modal')
+const { React, getModuleByDisplayName, getModule } = require('@vizality/webpack')
+const { ModalHeader, ModalContent, ModalCloseButton } = getModule("ModalRoot")
 const { resolve } = require('path')
 
 const FormTitle = getModuleByDisplayName('FormTitle', false)
 
 let ErrorBoundary = props => props.children
 try {
-  ErrorBoundary = require('../../pc-settings/components/ErrorBoundary')
+  ErrorBoundary = vizality.modules.components.ErrorBoundary
 } catch (e) {
-  console.error('Failed to load powercord\'s ErrorBoundary component!', e)
+  console.error('Failed to load vizality\'s ErrorBoundary component!', e)
 }
 
 module.exports = class PluginSettings extends React.Component {
@@ -25,32 +24,35 @@ module.exports = class PluginSettings extends React.Component {
         .join('\n')
         .split(resolve(__dirname, '..', '..')).join('')
 
-      return <div className='powercord-text powercord-settings-error'>
-        <div>An error occurred while rendering settings panel.</div>
-        <code>{error}</code>
-      </div>
+      return (
+        <div className='vizality-text vizality-settings-error'><div>An error occurred while rendering settings panel.</div><code>{error}</code></div>
+      )
     }
-    if (panel instanceof Node || typeof panel === 'string') {
+    if (panel instanceof Node || typeof panel === 'string')
       return <div ref={el => el ? panel instanceof Node ? el.append(panel) : el.innerHTML = panel : void 0}></div>
-    }
-    return typeof panel === 'function' ? React.createElement(panel) : panel
+
+    return panel
   }
 
   render () {
     const { plugin } = this.props
-
-    return (
-      <Modal size={Modal.Sizes.MEDIUM}>
-        <Modal.Header>
-          <FormTitle tag={FormTitle.Tags.H4}>{plugin.getName()} Settings</FormTitle>
-          <Modal.CloseButton onClick={closeModal}/>
-        </Modal.Header>
-        <Modal.Content>
-          <div className='plugin-settings' id={'plugin-settings-' + plugin.getName()}>
-            <ErrorBoundary>{this.renderPluginSettings()}</ErrorBoundary>
-          </div>
-        </Modal.Content>
-      </Modal>
-    )
+    try {
+      return (
+        <>
+          <ModalHeader separator={false}>
+            <FormTitle tag={FormTitle.Tags.H4}>{plugin.getName()} Settings</FormTitle>
+            <ModalCloseButton onClick={() => this.props.modalProps.onClose()}/>
+          </ModalHeader>
+          <ModalContent>
+            <div className='plugin-settings' id={`plugin-settings-${plugin.getName()}`}>
+              <ErrorBoundary>{this.renderPluginSettings()}</ErrorBoundary>
+            </div>
+          </ModalContent>
+        </>
+      )
+    } 
+    catch (error) {
+      return <ModalHeader separator={false}><FormTitle tag={FormTitle.Tags.H4}>Error</FormTitle><ModalCloseButton onClick={() => this.props.modalProps.onClose()}/></ModalHeader>
+    }
   }
 }
