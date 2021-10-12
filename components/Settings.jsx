@@ -1,5 +1,5 @@
-const { React } = require('@vizality/webpack')
-const { SwitchItem } = require('@vizality/components/settings')
+import { React } from "@vizality/webpack"
+import { SwitchItem } from "@vizality/components/settings"
 
 const PluginList = require('./PluginList.jsx')
 

@@ -1,55 +1,54 @@
-const { shell: { openPath } } = require('electron')
+import { React } from "@vizality/webpack"
+import { Button } from "@vizality/components"
+import { TextInput } from "@vizality/components/settings"
+import { shell as eleShell } from "electron"
 
-const { React } = require('@vizality/webpack')
-const { Button } = require('@vizality/components')
-const { TextInput } = require('@vizality/components/settings')
-
-const Plugin = require('./Plugin.jsx')
+const Plugin = require("./Plugin.jsx")
 
 module.exports = class PluginList extends React.Component {
   constructor (props) {
     super(props)
     
     this.state = {
-      search: '',
+      search: "",
     }
   }
   render () {
     const plugins = this.__getPlugins()
-
     return (
-      <div className='vizality-entities-manage powercord-text'>
-        <div className='vizality-entities-manage-header'>
-          <Button
-            onClick={() => openPath(window.ContentManager.pluginsFolder)}
-            size={Button.Sizes.SMALL}
-            color={Button.Colors.PRIMARY}
-            look={Button.Looks.OUTLINED}
-          >
-            Open Plugins Folder
-          </Button>
-        </div>
-        <div className='vizality-entities-manage-search'>
-          <TextInput
-            value={this.state.search}
-            onChange={(val) => this.setState({ search: val })}
-            placeholder='What are you looking for?'
-          >
-            Search plugins
-          </TextInput>
+      <div className="vz-addons-list">
+        <div className="vz-sticky-element-wrapper vz-addons-list-sticky-bar-wrapper" style={{top: "12px"}}>
+          <div style={{padding: "12px"}}>
+            <div className="vizality-entities-manage-header">
+              <Button
+                onClick={() => eleShell.openPath(window.ContentManager.pluginsFolder)}
+                size={Button.Sizes.SMALL}
+                color={Button.Colors.PRIMARY}
+                look={Button.Looks.OUTLINED}
+              >Open Plugins Folder</Button>
+            </div>
+            <div className="vizality-entities-manage-search" style={{marginTop: "12px"}}>
+              <TextInput
+                value={this.state.search}
+                onChange={(val) => this.setState({ search: val })}
+                placeholder="What are you looking for?"
+              >Search plugins</TextInput>
+            </div>
+          </div>
         </div>
 
-        <div className='vz-addons-list-items'>
-          {plugins.map((plugin) =>
-            <Plugin
-              plugin={plugin.plugin}
-              meta={plugin}
-
-              onEnable={() => this.props.pluginManager.enablePlugin(plugin.plugin.getName())}
-              onDisable={() => this.props.pluginManager.disablePlugin(plugin.plugin.getName())}
-              onDelete={() => this.__deletePlugin(plugin.plugin.getName())}
-            />
-          )}
+        <div className="vz-addons-list-inner">
+          <div className="vz-addons-list-items">
+            {plugins.map((plugin) =>
+              <Plugin
+                plugin={plugin.plugin}
+                meta={plugin}
+                onEnable={() => this.props.pluginManager.enablePlugin(plugin.plugin.getName())}
+                onDisable={() => this.props.pluginManager.disablePlugin(plugin.plugin.getName())}
+                onDelete={() => this.__deletePlugin(plugin.plugin.getName())}
+              />
+            )}
+          </div>
         </div>
       </div>
     )
@@ -59,7 +58,7 @@ module.exports = class PluginList extends React.Component {
     let plugins = Object.keys(window.bdplugins)
       .map((plugin) => window.bdplugins[plugin])
 
-    if (this.state.search !== '') {
+    if (this.state.search !== "") {
       const search = this.state.search.toLowerCase()
 
       plugins = plugins.filter(({ plugin }) =>

@@ -1,14 +1,14 @@
-const path = require('path')
-const fs = require('fs')
-const crypto = require('crypto')
+import { getModule, getAllModules, getModuleByDisplayName, React, ReactDOM } from "@vizality/webpack"
+import { patch, unpatch } from "@vizality/patcher"
+import { join } from "path"
+import { existsSync, writeFileSync, mkdirSync, readFileSync } from "fs"
+import { randomBytes } from "crypto"
 
-const { getModule, getAllModules, getModuleByDisplayName, React, ReactDOM } = require('@vizality/webpack')
+import Patcher from "./Patcher"
+
 const { getOwnerInstance, getReactInstance } = require('@vizality/util').react
-const { patch, unpatch } = require('@vizality/patcher')
 
 const PluginData = {}
-
-const Patcher = require('./Patcher')
 
 
 // __ is not part of BdApi entirely
@@ -108,18 +108,18 @@ class BdApi {
   }
 
   static __getPluginConfigPath (pluginName) {
-    return path.join(__dirname, '..', 'config', pluginName + '.config.json')
+    return join(__dirname, '..', 'config', pluginName + '.config.json')
   }
 
   static __getPluginConfig (pluginName) {
     const configPath = BdApi.__getPluginConfigPath(pluginName)
 
     if (typeof BdApi.__pluginData[pluginName] === 'undefined')
-      if (!fs.existsSync(configPath)) {
+      if (!existsSync(configPath)) {
         BdApi.__pluginData[pluginName] = {}
       } else {
         try {
-          BdApi.__pluginData[pluginName] = JSON.parse(fs.readFileSync(configPath))
+          BdApi.__pluginData[pluginName] = JSON.parse(readFileSync(configPath))
         } catch (e) {
           BdApi.__pluginData[pluginName] = {}
           BdApi.__warn(`${pluginName} has corrupted or empty config file, loaded as {}`)
@@ -132,10 +132,10 @@ class BdApi {
 
   static __savePluginConfig (pluginName) {
     const configPath = BdApi.__getPluginConfigPath(pluginName)
-    const configFolder = path.join(__dirname, '..', 'config/')
+    const configFolder = join(__dirname, '..', 'config/')
 
-    if (!fs.existsSync(configFolder)) fs.mkdirSync(configFolder)
-    fs.writeFileSync(configPath, JSON.stringify(BdApi.__pluginData[pluginName], null, 2))
+    if (!existsSync(configFolder)) mkdirSync(configFolder)
+    writeFileSync(configPath, JSON.stringify(BdApi.__pluginData[pluginName], null, 2))
   }
 
 
@@ -290,10 +290,7 @@ class BdApi {
   }
 
   static getInternalInstance (node) {
-    if (!(node instanceof window.jQuery) && !(node instanceof Element)) return undefined // eslint-disable-line no-undefined
-    if (node instanceof window.jQuery) node = node[0] // eslint-disable-line no-param-reassign
-
-    return getOwnerInstance(node)
+    return getOwnerInstance(node[0])
   }
 
   static findModule(filter) {
@@ -369,7 +366,7 @@ class BdApi {
   }
 
   static __injectBefore (data, origMethod) {
-    const patchID = `bd-patch-before-${data.displayName.toLowerCase()}-${crypto.randomBytes(4).toString('hex')}`
+    const patchID = `bd-patch-before-${data.displayName.toLowerCase()}-${randomBytes(4).toString('hex')}`
 
     const cancelPatch = () => {
       if (!data.options.silent) BdApi.__log(`Unpatching before of ${data.displayName} ${data.methodName}`)
@@ -402,14 +399,14 @@ class BdApi {
   }
 
   static __injectAfter (data, origMethod) {
-    const patchID = `bd-patch-after-${data.displayName.toLowerCase()}-${crypto.randomBytes(4).toString('hex')}`
+    const patchID = `bd-patch-after-${data.displayName.toLowerCase()}-${randomBytes(4).toString('hex')}`
 
     const cancelPatch = () => {
       if (!data.options.silent) BdApi.__log(`Unpatching after of ${data.displayName} ${data.methodName}`)
       unpatch(patchID)
     }
 
-    inject(patchID, data.what, data.methodName, function afterPatch (args, res) {
+    patch(patchID, data.what, data.methodName, function afterPatch (args, res) {
       const patchData = {
         // eslint-disable-next-line no-invalid-this
         thisObject: this,
@@ -435,9 +432,7 @@ class BdApi {
   }
 
   static getInternalInstance (node) {
-    if (!(node instanceof window.jQuery) && !(node instanceof Element)) return undefined
-    if (node instanceof window.jQuery) node = node[0]
-    return getReactInstance(node)
+    return getReactInstance(node[0])
   }
 
   static get settings() { // mess

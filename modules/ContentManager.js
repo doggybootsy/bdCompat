@@ -1,6 +1,7 @@
-const { existsSync, mkdirSync, readFileSync } = require('fs')
-const { join, dirname, resolve, basename } = require('path')
-const { Module } = require('module')
+import { join, dirname, resolve, basename } from "path"
+import { Module } from "module"
+import { existsSync, mkdirSync, readFileSync } from "fs"
+
 const originalRequire = Module._extensions['.js']
 let _this
 

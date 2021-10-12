@@ -1,9 +1,9 @@
-const { webFrame } = require('electron')
-const { join } = require('path')
-const { Module } = require('module')
-const { existsSync, readdirSync, unlinkSync } = require('fs')
-const { getModule, FluxDispatcher } = require('@vizality/webpack')
-const { patch, unpatch } = require('@vizality/patcher')
+import { webFrame } from "electron"
+import { join } from "path"
+import { Module } from "module"
+import { existsSync, readdirSync, unlinkSync } from "fs"
+import { getModule, FluxDispatcher } from "@vizality/webpack"
+import { patch, unpatch } from "@vizality/patcher"
 
 // Allow loading from discords node_modules
 Module.globalPaths.push(join(process.resourcesPath, 'app.asar/node_modules'))
@@ -218,15 +218,11 @@ module.exports = class BDPluginManager {
     if (!window?.ZLibrary?.Patcher) return this.__error(null, 'Failed to patch ZLibrary Patcher')
 
     const origFunction = Function
-    patch('bdCompat-zlib-patcher-pre', window.ZLibrary.Patcher, 'pushChildPatch', args => {
+    patch('bdCompat-zlib-patcher-pre', window.ZLibrary.Patcher, 'pushChildPatch', (args) => {
       const orig = args[1]?.[args[2]]
       if (orig && !(orig instanceof origFunction) && orig instanceof _window.Function) window.Function = _window.Function
-      return args
     }, true)
-    patch('bdCompat-zlib-patcher', window.ZLibrary.Patcher, 'pushChildPatch', (_, res) => {
-      window.Function = origFunction
-      return res
-    })
+    patch('bdCompat-zlib-patcher', window.ZLibrary.Patcher, 'pushChildPatch', () => window.Function = origFunction)
 
     this.__log('Patched ZLibrary Patcher')
   }

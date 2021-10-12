@@ -1,5 +1,6 @@
 const { Plugin } = require('@vizality/entities')
 const process = require('process')
+const { webFrame } = require('electron')
 
 const { AddonAPI, BDApi, ContentManager, PluginManager } = require('./modules')
 
@@ -47,6 +48,7 @@ module.exports = class BDCompat extends Plugin {
     window.BdApi.Plugins = new AddonAPI(window.bdplugins, window.pluginModule)
     window.BdApi.Themes  = new AddonAPI({}, {})
 
+    webFrame.top.context.window.BdApi = window.BdApi
     this.log('Defined BetterDiscord globals')
   }
 

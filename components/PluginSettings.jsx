@@ -1,15 +1,10 @@
-const { React, getModuleByDisplayName, getModule } = require('@vizality/webpack')
-const { ModalHeader, ModalContent, ModalCloseButton } = getModule("ModalRoot")
-const { resolve } = require('path')
+import { React, getModuleByDisplayName, getModule } from "@vizality/webpack"
+import { resolve } from "path"
 
-const FormTitle = getModuleByDisplayName('FormTitle', false)
-
-let ErrorBoundary = props => props.children
-try {
-  ErrorBoundary = vizality.modules.components.ErrorBoundary
-} catch (e) {
-  console.error('Failed to load vizality\'s ErrorBoundary component!', e)
-}
+const { ModalHeader, ModalContent, ModalCloseButton, ModalFooter } = getModule("ModalRoot")
+const { Messages } = getModule(["Messages"])
+const Button = getModule(["ButtonLooks"])
+const FormTitle = getModuleByDisplayName('FormTitle')
 
 module.exports = class PluginSettings extends React.Component {
   renderPluginSettings() {
@@ -25,13 +20,16 @@ module.exports = class PluginSettings extends React.Component {
         .split(resolve(__dirname, '..', '..')).join('')
 
       return (
-        <div className='vizality-text vizality-settings-error'><div>An error occurred while rendering settings panel.</div><code>{error}</code></div>
+        <div className='vizality-text vizality-settings-error'>
+          <div>An error occurred while rendering settings panel.</div>
+          <code>{error}</code>
+        </div>
       )
     }
     if (panel instanceof Node || typeof panel === 'string')
       return <div ref={el => el ? panel instanceof Node ? el.append(panel) : el.innerHTML = panel : void 0}></div>
 
-    return panel
+    return typeof panel === 'function' ? React.createElement(panel) : panel
   }
 
   render () {
@@ -41,13 +39,15 @@ module.exports = class PluginSettings extends React.Component {
         <>
           <ModalHeader separator={false}>
             <FormTitle tag={FormTitle.Tags.H4}>{plugin.getName()} Settings</FormTitle>
-            <ModalCloseButton onClick={() => this.props.modalProps.onClose()}/>
           </ModalHeader>
           <ModalContent>
             <div className='plugin-settings' id={`plugin-settings-${plugin.getName()}`}>
-              <ErrorBoundary>{this.renderPluginSettings()}</ErrorBoundary>
+            {this.renderPluginSettings()}
             </div>
           </ModalContent>
+          <ModalFooter>
+            <Button.default onClick={() => this.props.modalProps.onClose()}>{Messages.DONE}</Button.default>
+          </ModalFooter>
         </>
       )
     } 
