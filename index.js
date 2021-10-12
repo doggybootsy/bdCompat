@@ -48,13 +48,13 @@ module.exports = class BDCompat extends Plugin {
     window.BdApi.Plugins = new AddonAPI(window.bdplugins, window.pluginModule)
     window.BdApi.Themes  = new AddonAPI({}, {})
 
-    webFrame.top.context.window.BdApi = window.BdApi
+    webFrame.top.context.BdApi = window.BdApi
     this.log('Defined BetterDiscord globals')
   }
 
   destroyGlobals () {
     const globals = ['bdConfig', 'settingsCookie', 'bdplugins', 'pluginCookie', 'bdpluginErrors', 'bdthemes',
-      'themeCookie', 'bdthemeErrors', 'BdApi', 'Utils', 'BDV2', 'ContentManager', 'pluginModule']
+      'themeCookie', 'bdthemeErrors', 'BdApi', 'Utils', 'ContentManager', 'pluginModule']
 
     globals.forEach(g => {
       delete window[g]

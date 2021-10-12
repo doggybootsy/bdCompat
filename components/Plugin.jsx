@@ -1,4 +1,4 @@
-import { Icon, Switch } from "@vizality/components"
+import { Icon, Switch, Anchor, OverflowTooltip } from "@vizality/components"
 import { shell as eleShell } from "electron"
 import { React, getModule } from "@vizality/webpack"
 import SettingsModal from "./PluginSettings.jsx"
@@ -6,37 +6,40 @@ import SettingsModal from "./PluginSettings.jsx"
 const { openModal } = getModule("openModal")
 const { ModalRoot, ModalSize } = getModule("ModalRoot")
 const Button = getModule("ButtonLooks")
-
+const Link = getModule(["Link"]).Link
 module.exports = class Plugin extends React.Component {
   constructor(props) {
     super(props)
     this.state = ({enabled: this.props.meta.__started})
   }
   render () {
-    const name = this.props.plugin.getName() || this.props.meta.name
-    const version = this.props.plugin.getVersion() || this.props.meta.version
-    const author = this.props.plugin.getAuthor() || this.props.meta.author
-    const description = this.props.plugin.getDescription() || this.props.meta.description
+    const name = (this.props.plugin.getName() || this.props.meta.name) ?? "No author"
+    const version = (this.props.plugin.getVersion() || this.props.meta.version) ?? "No version"
+    const author = (this.props.plugin.getAuthor() || this.props.meta.author) ?? "No author"
+    const description = (this.props.plugin.getDescription() || this.props.meta.description) ?? "UnNamed"
+    const LibraryMissing = `${this.props.plugin.load}`.includes("Library plugin is needed") || `${this.props.plugin.load}`.includes("Library Missing")
     return (
       <>
-        <div class="vz-addon-card" vz-addon-id="addon-installer" vz-addon-type="plugin"><div class="vz-addon-card-header-wrapper">
-          <div class="vz-addon-card-content-wrapper">
-            <div class="vz-addon-card-content">
-              <div class="vz-addon-card-header">
-                <div class="vz-addon-card-metadata">
-                  <div class="vz-addon-card-name-version">
-                    <div class="vz-overflow-tooltip vz-addon-card-name">{name}</div>
-                    <span class="vz-addon-card-version">{version}</span>
-                  </div>
-                  <div class="vz-overflow-tooltip vz-addon-card-author-wrapper" aria-label={author}>
-                    <vizality.modules.components.Anchor 
-                      type='user'
-                      userId={this.props.meta?.authorId}
-                      className='vz-addon-card-author'>{author}</vizality.modules.components.Anchor>
+        <div class="vz-addon-card" vz-addon-id="addon-installer" vz-addon-type="plugin">
+          <div class="vz-addon-card-header-wrapper">
+            <div class="vz-addon-card-content-wrapper">
+              <div class="vz-addon-card-content">
+                <div class="vz-addon-card-header">
+                  <div class="vz-addon-card-metadata">
+                    <div class="vz-addon-card-name-version">
+                      <div class="vz-overflow-tooltip vz-addon-card-name">{name}</div>
+                      <span class="vz-addon-card-version">{version}</span>
+                    </div>
+                    <OverflowTooltip className='vz-addon-card-author-wrapper' text={author}>
+                      {(typeof(this.props.meta?.authorLink) === undefined) ? (
+                        <Anchor type="user"userId={this.props.meta?.authorId}className="vz-addon-card-author">{author}</Anchor>
+                      ) : (
+                        <Anchor className="vz-addon-card-author" href={this.props.meta.authorLink}>{author}</Anchor>
+                      )}
+                    </OverflowTooltip>
                   </div>
                 </div>
-              </div>
-              <div class="vz-addon-card-description">{description}</div>
+                <div class="vz-addon-card-description">{description}</div>
                 <div class="vz-addon-card-footer-wrapper">
                   <div class="vz-addon-card-footer">
                     <div class="vz-addon-card-footer-section-left">
@@ -45,23 +48,28 @@ module.exports = class Plugin extends React.Component {
                           size={Button.ButtonSizes.ICON}
                           color={Button.ButtonColors.RED}
                           onClick={() => BdApi.showConfirmationModal(
-                            `Uninstall ${name}`, 
+                          `Uninstall ${name}`, 
                             [`Are you sure you wan't to uninstall ${name}`], 
                             {
                               danger: true, 
                               confirmText: "Uninstall", 
-                              onConfirm: () => {this.props.onDelete()}
+                              onConfirm: this.props.onDelete
                             }
                           )}
                         >
                           <Icon 
                             name="Trash" 
-                            tooltip="Uninstall"
-                          />
+                            tooltip="Uninstall" />
                         </Button.default>
                       </div>
                     </div>
                     <div class="vz-addon-card-footer-section-right">
+                      {LibraryMissing && (
+                        <Icon
+                          name="WarningCircle"
+                          tooltip="A library is needed for this plugin to properly work"
+                        />
+                      )}
                       {(typeof this.props.meta.source === "string") && (
                         <Icon
                           name="GitHub"
@@ -82,11 +90,7 @@ module.exports = class Plugin extends React.Component {
                         />
                       )}
                       {(typeof this.props.meta.website === "string") && (
-                        <Icon
-                          name="Globe"
-                          tooltip="Website"
-                          onClick={() => eleShell.openExternal(this.props.meta.website)}
-                        />
+                        <Icon name="Globe" tooltip="Website" onClick={() => eleShell.openExternal(this.props.meta.website)} />
                       )}
                       {(typeof this.props.plugin.getSettingsPanel === "function" && this.state.enabled) && (
                         <Icon
