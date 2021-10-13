@@ -8,7 +8,7 @@ const ranNum = () => {
   if (num > 5) num = (num - 5)
   return num
 }
-const ranNumRes = ranNum()
+
 const Plugin = require("./Plugin.jsx")
 
 module.exports = class PluginList extends React.Component {
@@ -47,7 +47,7 @@ module.exports = class PluginList extends React.Component {
           <div className="vz-addons-list-items">
             {plugins.map((plugin) =>
               <Plugin
-                ranNum={ranNumRes}
+                ranNum={ranNum()}
                 plugin={plugin.plugin}
                 meta={plugin}
                 onEnable={() => this.props.pluginManager.enablePlugin(plugin.plugin.getName())}

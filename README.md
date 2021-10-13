@@ -1,6 +1,6 @@
 # bdCompat
 
-Compatibility layer for running BetterDiscord plugins in Powercord
+Compatibility layer for running BetterDiscord plugins in Vizality
 
 [![Screenshot showing a list of BetterDiscord plugins](https://i.imgur.com/xaAOdSE.png)](https://i.imgur.com/xaAOdSE.png)
 
@@ -9,12 +9,10 @@ Compatibility layer for running BetterDiscord plugins in Powercord
 Clone this repository to your Powercord install's plugins folder
 
 ```
-git clone https://github.com/Juby210/bdCompat
+git clone https://github.com/doggybootsy/bdCompat
 ```
 
 ## Installing BD plugins
-
-<!-- Before you download and install any BD plugins, please take a look at the incompatibilites note on `INCOMPATIBILITIES.md` file -->
 
 - Put the plugin in the `plugins` folder, if it doesn't exist then create one.
 - Reload your Discord.
