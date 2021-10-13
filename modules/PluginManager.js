@@ -88,8 +88,10 @@ module.exports = class BDPluginManager {
       plugin.plugin.start()
       plugin.__started = true
       this.__log(`Started plugin ${plugin.plugin.getName()}`)
+      BdApi.showToast(`Started ${pluginName}`, {type: "success"})
     } catch (err) {
       this.__error(err, `Could not start ${plugin.plugin.getName()}`)
+      BdApi.showToast(`Couldn't ${pluginName}`, {type: "success"})
       window.BdApi.saveData('BDCompat-EnabledPlugins', plugin.plugin.getName(), false)
     }
   }

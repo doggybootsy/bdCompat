@@ -1,5 +1,5 @@
 import { React } from "@vizality/webpack"
-import { Card, Compact } from "./Card"
+import { Card, Compact, Cover, List } from "./Card"
 
 module.exports = class Plugin extends React.Component {
   constructor(props) {
@@ -14,7 +14,9 @@ module.exports = class Plugin extends React.Component {
     const display = vizality.api.settings._fluxProps('addon-manager').getSetting('listDisplay', 'card')
     if (display === "card") return (<Card enabled={this.state.enabled} {...this.props} onChange={CardOnChange}/>)
     if (display === "compact") return (<Compact enabled={this.state.enabled} {...this.props} onChange={CardOnChange}/>)
-    else return ("error")
+    if (display === "cover") return (<Cover enabled={this.state.enabled} {...this.props} onChange={CardOnChange}/>)
+    if (display === "list") return (<List enabled={this.state.enabled} {...this.props} onChange={CardOnChange}/>)
+    else return ("error ")
   }
 
   togglePlugin () {

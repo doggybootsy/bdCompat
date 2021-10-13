@@ -1,8 +1,7 @@
-import { shell as eleShell } from "electron"
 import { Icon, Switch, Anchor, OverflowTooltip, LazyImage } from "@vizality/components"
-import { getModule, React } from "@vizality/webpack"
+import { shell as eleShell } from "electron"
+import { React, getModule } from "@vizality/webpack"
 import SettingsModal from "../PluginSettings.jsx"
-
 const { openModal } = getModule("openModal")
 const { ModalRoot, ModalSize } = getModule("ModalRoot")
 const Button = getModule("ButtonLooks")
@@ -21,39 +20,39 @@ module.exports = class Card extends React.Component {
     const icon = (this.props.meta.vzIcon) ?? `vizality://assets/images/default-plugin-${this.props.ranNum}.png?width=0&height=0`
     return (
       <>
-        <div class="vz-addon-card" vz-addon-id="addon-installer" vz-addon-type="plugin">
+        <div class="vz-addon-card" vz-addon-id="bd-compat" vz-addon-type="plugin">
           <div class="vz-addon-card-header-wrapper">
+            <div className="vz-addon-card-icon">
+              <LazyImage
+                className="vz-addon-card-icon-image-wrapper"
+                imageClassName="vz-addon-card-icon-img"
+                src={icon}
+              />
+            </div>
             <div class="vz-addon-card-content-wrapper">
               <div class="vz-addon-card-content">
                 <div class="vz-addon-card-header">
-                  <div className="vz-addon-card-icon">
-                    <LazyImage
-                      className="vz-addon-card-icon-image-wrapper"
-                      imageClassName="vz-addon-card-icon-img"
-                      src={icon}
-                    />
-                  </div>
                   <div class="vz-addon-card-metadata">
                     <div class="vz-addon-card-name-version">
-                      <OverflowTooltip className="vz-addon-card-author-wrapper" text={name}>{name}</OverflowTooltip>
-                      <span class="vz-addon-card-version">{version}</span>
-                    </div>
-                    <OverflowTooltip className="vz-addon-card-author-wrapper" text={author}>
-                      {(this.props.meta.authorLink == undefined) ? (
-                        <Anchor 
-                          type="user" 
-                          userId={this.props.meta?.authorId} 
-                          className='vz-addon-card-author'>{author}</Anchor>
-                      ) : (
-                        <Anchor 
-                          style={{pointerEvents: "all"}}
-                          className='vz-addon-card-author'
-                          href={this.props.meta.authorLink}>{author}</Anchor>
-                      )}
-                    </OverflowTooltip>
+                    <OverflowTooltip className="vz-addon-card-author-wrapper" text={name}>{name}</OverflowTooltip>
+                    <span class="vz-addon-card-version">{version}</span>
                   </div>
+                  <OverflowTooltip className="vz-addon-card-author-wrapper" text={author}>
+                    {(this.props.meta.authorLink == undefined) ? (
+                      <Anchor 
+                        type="user" 
+                        userId={this.props.meta?.authorId} 
+                        className='vz-addon-card-author'>{author}</Anchor>
+                    ) : (
+                    <Anchor 
+                        style={{pointerEvents: "all"}}
+                        className='vz-addon-card-author'
+                        href={this.props.meta.authorLink}>{author}</Anchor>
+                    )}
+                  </OverflowTooltip>
                 </div>
-                <div class="vz-addon-card-description">{description}</div>
+              </div>
+              <div class="vz-addon-card-description">{description}</div>
                 <div class="vz-addon-card-footer-wrapper">
                   <div class="vz-addon-card-footer">
                     <div class="vz-addon-card-footer-section-left">

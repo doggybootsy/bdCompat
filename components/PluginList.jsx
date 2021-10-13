@@ -3,6 +3,12 @@ import { Button } from "@vizality/components"
 import { TextInput } from "@vizality/components/settings"
 import { shell as eleShell } from "electron"
 
+const ranNum = () => {
+  let num = Math.floor(Math.random() * 10 + 1)
+  if (num > 5) num = (num - 5)
+  return num
+}
+const ranNumRes = ranNum()
 const Plugin = require("./Plugin.jsx")
 
 module.exports = class PluginList extends React.Component {
@@ -17,7 +23,7 @@ module.exports = class PluginList extends React.Component {
     const plugins = this.__getPlugins()
     return (
       <div className="vz-addons-list" vz-display={vizality.api.settings._fluxProps('addon-manager').getSetting('listDisplay', 'card')}>
-        <div className="vz-sticky-element-wrapper vz-addons-list-sticky-bar-wrapper" style={{top: "12px"}}>
+        <div className="vz-sticky-element-wrapper vz-addons-list-sticky-bar-wrapper" style={{top: "42px"}}>
           <div style={{padding: "12px"}}>
             <div className="vizality-entities-manage-header">
               <Button
@@ -41,6 +47,7 @@ module.exports = class PluginList extends React.Component {
           <div className="vz-addons-list-items">
             {plugins.map((plugin) =>
               <Plugin
+                ranNum={ranNumRes}
                 plugin={plugin.plugin}
                 meta={plugin}
                 onEnable={() => this.props.pluginManager.enablePlugin(plugin.plugin.getName())}
