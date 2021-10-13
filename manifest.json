@@ -2,6 +2,6 @@
   "name": "BetterDiscord plugin compatibility (bdCompat)",
   "version": "0.3.10",
   "description": "Adds support for running BetterDiscord plugins",
-  "author": "intrnl & Juby210",
+  "author": "Doggybootsy (orig. intrnl & Juby210)",
   "license": "MIT"
 }

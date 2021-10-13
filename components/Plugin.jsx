@@ -1,5 +1,6 @@
-import { React } from "@vizality/webpack"
-import { Card, Compact, Cover, List } from "./Card"
+import { React, contextMenu } from "@vizality/webpack"
+import Cards from "./Card"
+import ContextMenu from "./ContextMenu"
 
 module.exports = class Plugin extends React.Component {
   constructor(props) {
@@ -12,11 +13,36 @@ module.exports = class Plugin extends React.Component {
       this.togglePlugin()
     }
     const display = vizality.api.settings._fluxProps('addon-manager').getSetting('listDisplay', 'card')
-    if (display === "card") return (<Card enabled={this.state.enabled} {...this.props} onChange={CardOnChange}/>)
-    if (display === "compact") return (<Compact enabled={this.state.enabled} {...this.props} onChange={CardOnChange}/>)
-    if (display === "cover") return (<Cover enabled={this.state.enabled} {...this.props} onChange={CardOnChange}/>)
-    if (display === "list") return (<List enabled={this.state.enabled} {...this.props} onChange={CardOnChange}/>)
-    else return ("error ")
+    const Card = Cards[`${display[0].toUpperCase()}${display.substring(1)}`]
+
+    const handleContextMenu = evt => {
+      return contextMenu.openContextMenu(evt, () =>
+        <ContextMenu 
+          enabled={this.state.enabled} 
+          {...this.props}
+          onChange={CardOnChange} 
+        />
+      );
+    };
+
+    if(Card != undefined) return (
+      <div class="vz-addon-card" vz-addon-type="plugin" onContextMenu={handleContextMenu}>
+        <Card 
+          enabled={this.state.enabled} 
+          {...this.props}
+          onChange={CardOnChange} 
+        />
+      </div>
+    )
+    return (
+      <div class="vz-addon-card" vz-addon-type="plugin" onContextMenu={handleContextMenu}>
+        <Cards.Card 
+          enabled={this.state.enabled} 
+          {...this.props}
+          onChange={CardOnChange} 
+        />
+      </div>
+    )
   }
 
   togglePlugin () {

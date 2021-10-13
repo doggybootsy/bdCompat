@@ -3,12 +3,6 @@ import { Button } from "@vizality/components"
 import { TextInput } from "@vizality/components/settings"
 import { shell as eleShell } from "electron"
 
-const ranNum = () => {
-  let num = Math.floor(Math.random() * 10 + 1)
-  if (num > 5) num = (num - 5)
-  return num
-}
-
 const Plugin = require("./Plugin.jsx")
 
 module.exports = class PluginList extends React.Component {
@@ -21,6 +15,7 @@ module.exports = class PluginList extends React.Component {
   }
   render () {
     const plugins = this.__getPlugins()
+    let num = 0
     return (
       <div className="vz-addons-list" vz-display={vizality.api.settings._fluxProps('addon-manager').getSetting('listDisplay', 'card')}>
         <div className="vz-sticky-element-wrapper vz-addons-list-sticky-bar-wrapper" style={{top: "42px"}}>
@@ -45,15 +40,18 @@ module.exports = class PluginList extends React.Component {
 
         <div className="vz-addons-list-inner">
           <div className="vz-addons-list-items">
-            {plugins.map((plugin) =>
-              <Plugin
-                ranNum={ranNum()}
-                plugin={plugin.plugin}
-                meta={plugin}
-                onEnable={() => this.props.pluginManager.enablePlugin(plugin.plugin.getName())}
-                onDisable={() => this.props.pluginManager.disablePlugin(plugin.plugin.getName())}
-                onDelete={() => this.__deletePlugin(plugin.plugin.getName())}
-              />
+            {plugins.map((plugin) => {
+              num++
+              if(num == 6) num = 1
+              return <Plugin
+                  ranNum={num}
+                  plugin={plugin.plugin}
+                  meta={plugin}
+                  onEnable={() => this.props.pluginManager.enablePlugin(plugin.plugin.getName())}
+                  onDisable={() => this.props.pluginManager.disablePlugin(plugin.plugin.getName())}
+                  onDelete={() => this.__deletePlugin(plugin.plugin.getName())}
+                />
+              }
             )}
           </div>
         </div>

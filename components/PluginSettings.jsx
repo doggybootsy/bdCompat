@@ -42,7 +42,7 @@ module.exports = class PluginSettings extends React.Component {
           </ModalHeader>
           <ModalContent>
             <div className='plugin-settings' id={`plugin-settings-${plugin.getName()}`}>
-            {this.renderPluginSettings()}
+              {this.renderPluginSettings()}
             </div>
           </ModalContent>
           <ModalFooter>

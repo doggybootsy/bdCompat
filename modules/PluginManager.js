@@ -91,7 +91,7 @@ module.exports = class BDPluginManager {
       BdApi.showToast(`Started ${pluginName}`, {type: "success"})
     } catch (err) {
       this.__error(err, `Could not start ${plugin.plugin.getName()}`)
-      BdApi.showToast(`Couldn't ${pluginName}`, {type: "success"})
+      BdApi.showToast(`Couldn't start ${pluginName}`, {type: "success"})
       window.BdApi.saveData('BDCompat-EnabledPlugins', plugin.plugin.getName(), false)
     }
   }
@@ -130,7 +130,6 @@ module.exports = class BDPluginManager {
 
     window.BdApi.saveData('BDCompat-EnabledPlugins', plugin.plugin.getName(), true)
     this.startPlugin(pluginName)
-    BdApi.showToast(`Started ${pluginName}`, {type: "success"})
   }
   disablePlugin (pluginName) {
     const plugin = window.bdplugins[pluginName]
