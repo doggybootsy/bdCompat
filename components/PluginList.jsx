@@ -16,7 +16,7 @@ module.exports = class PluginList extends React.Component {
   render () {
     const plugins = this.__getPlugins()
     return (
-      <div className="vz-addons-list">
+      <div className="vz-addons-list" vz-display={vizality.api.settings._fluxProps('addon-manager').getSetting('listDisplay', 'card')}>
         <div className="vz-sticky-element-wrapper vz-addons-list-sticky-bar-wrapper" style={{top: "12px"}}>
           <div style={{padding: "12px"}}>
             <div className="vizality-entities-manage-header">
