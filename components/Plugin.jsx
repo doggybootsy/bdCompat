@@ -5,7 +5,7 @@ import ContextMenu from "./ContextMenu"
 module.exports = class Plugin extends React.Component {
   constructor(props) {
     super(props)
-    this.state = ({enabled: this.props.meta.__started})
+    this.state = ({enabled: this.props.installed ? this.props.meta.__started : false})
   }
   render () {
     const CardOnChange = () => {

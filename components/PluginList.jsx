@@ -6,6 +6,7 @@ import { useToggle } from "@vizality/hooks"
 import DisplayPopout from "./Popout"
 import Plugin from "./Plugin.jsx"
 
+
 const Displaypopout = memo(({}) => {
   const [ showDisplayPopout, toggleDisplayPopout ] = useToggle(false)
 
@@ -35,7 +36,7 @@ module.exports = class PluginList extends React.Component {
     super(props)
     
     this.state = {
-      search: ""
+      search: "", page: "installed"
     }
   }
   render () {
@@ -44,48 +45,50 @@ module.exports = class PluginList extends React.Component {
     const Search = BdApi.findModuleByDisplayName("Searchbar")
     const Flex = BdApi.findModuleByDisplayName("Flex")
     const display = vizality.api.settings._fluxProps("addon-manager").getSetting("listDisplay", "card")
-
     return (
       <div className="vz-addons-list" vz-display={display}>
-        <StickyElement className="vz-sticky-element-wrapper vz-addons-list-sticky-bar-wrapper" style={{top: "40px"}}>
-          <Flex>
-            <Flex/>
-            <div style={{ width: "166px", margin: "auto" }}>
-              <Search 
-                size={Search.Sizes.SMALL}
-                placeholder="Search" 
-                query={this.state.search}
-                onChange={(val) => this.setState({search: val})}
-                onClear={() => this.setState({search: ""})}
-              />
-            </div>
-            <div style={{height: "1.8rem", width: "fit-content", padding: "0 0 0 .8rem", display: "flex"}}>
-              <Displaypopout />
-              <Icon 
-                name="Folder" 
-                onClick={() => eleShell.openPath(window.ContentManager.pluginsFolder)}
-                tooltip="Open Plugins Folder"
-                style={{ width: "24px", height: "28px"}}
-              />
-            </div>
-          </Flex>
-        </StickyElement>
+        <div className="vz-sticky-element-wrapper vz-addons-list-sticky-bar-wrapper" style={{top: "40px"}}>
+          <StickyElement className="vz-sticky-element vz-addons-list-sticky-bar">
+            <Flex>
+              <Flex></Flex>
+              <div style={{ width: "166px", margin: "auto" }}>
+                <Search 
+                  size={Search.Sizes.SMALL}
+                  placeholder="Search" 
+                  query={this.state.search}
+                  onChange={(val) => this.setState({search: val})}
+                  onClear={() => this.setState({search: ""})}
+                />
+              </div>
+              <div style={{height: "1.8rem", width: "fit-content", padding: "0 0 0 .8rem", display: "flex"}}>
+                <Displaypopout />
+                <Icon 
+                  name="Folder" 
+                  onClick={() => eleShell.openPath(window.ContentManager.pluginsFolder)}
+                  tooltip="Open Plugins Folder"
+                  style={{ width: "24px", height: "28px"}}
+                />
+              </div>
+            </Flex>
+          </StickyElement>
+        </div>
 
         <div className="vz-addons-list-inner">
           <div className="vz-addons-list-items">
             {plugins.map((plugin) => {
-              num++
-              if(num == 6) num = 1
-              return <Plugin
-                  ranNum={num}
-                  plugin={plugin.plugin}
-                  meta={plugin}
-                  onEnable={() => this.props.pluginManager.enablePlugin(plugin.plugin.getName())}
-                  onDisable={() => this.props.pluginManager.disablePlugin(plugin.plugin.getName())}
-                  onDelete={() => this.__deletePlugin(plugin.plugin.getName())}
-                />
-              }
-            )}
+                num++
+                if(num == 6) num = 1
+                return <Plugin
+                    ranNum={num}
+                    installed={true}
+                    plugin={plugin.plugin}
+                    meta={plugin}
+                    onEnable={() => this.props.pluginManager.enablePlugin(plugin.plugin.getName())}
+                    onDisable={() => this.props.pluginManager.disablePlugin(plugin.plugin.getName())}
+                    onDelete={() => this.__deletePlugin(plugin.plugin.getName())}
+                  />
+                }
+              )}
           </div>
         </div>
       </div>

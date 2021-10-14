@@ -32,7 +32,7 @@ module.exports = class Card extends React.Component {
             <div class="vz-addon-card-header">
               <div class="vz-addon-card-metadata">
                 <div class="vz-addon-card-name-version">
-                <OverflowTooltip className="vz-addon-card-author-wrapper" text={name}>{name}</OverflowTooltip>
+                <OverflowTooltip className="vz-addon-card-name" text={name}>{name}</OverflowTooltip>
                 <span class="vz-addon-card-version">{version}</span>
               </div>
               <OverflowTooltip className="vz-addon-card-author-wrapper" text={author}>
