@@ -54,7 +54,7 @@ module.exports = class Patcher {
     }
 
     static pushChildPatch(caller, module, functionName, callback, options = {}) {
-        const { type = 'after', forcePatch = true } = options
+        const { type = "after", forcePatch = true } = options
         const mdl = this.resolveModule(module)   
         if (!mdl) return null
         if (!mdl[functionName] && forcePatch) mdl[functionName] = function () {}

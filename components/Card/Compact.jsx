@@ -32,11 +32,17 @@ module.exports = class Compact extends React.Component {
                   <OverflowTooltip className="vz-addon-card-name" text={name}>{name}</OverflowTooltip>
                 </div>
                 <OverflowTooltip className="vz-addon-card-author-wrapper" text={author}>
-                  <Anchor
-                    type="user"
-                    userId={this.props.meta?.authorId}
-                    className="vz-addon-card-author"
-                  >{author}</Anchor>
+                  {(this.props.meta.authorLink == undefined) ? (
+                    <Anchor 
+                      type="user" 
+                      userId={this.props.meta?.authorId}
+                      className="vz-addon-card-author">{author}</Anchor>
+                  ) : (
+                    <Anchor 
+                      style={{pointerEvents: "all"}}
+                      className="vz-addon-card-author"
+                      href={this.props.meta.authorLink}>{author}</Anchor>
+                  )}
                 </OverflowTooltip>
               </div>
               <div className="vz-addon-card-actions">

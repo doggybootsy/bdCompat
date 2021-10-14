@@ -1,42 +1,75 @@
-import { React } from "@vizality/webpack"
-import { Button } from "@vizality/components"
-import { TextInput } from "@vizality/components/settings"
+import React, {memo} from "react"
+import { Icon, StickyElement, Popout } from "@vizality/components"
 import { shell as eleShell } from "electron"
+import { useToggle } from "@vizality/hooks"
 
-const Plugin = require("./Plugin.jsx")
+import DisplayPopout from "./Popout"
+import Plugin from "./Plugin.jsx"
+
+const Displaypopout = memo(({}) => {
+  const [ showDisplayPopout, toggleDisplayPopout ] = useToggle(false)
+
+  const display = vizality.api.settings._fluxProps("addon-manager").getSetting("listDisplay", "card")
+  
+  return (
+    <Popout renderPopout={props => <DisplayPopout {...props} />} position="left" animation="2" shouldShow={showDisplayPopout} onRequestClose={toggleDisplayPopout}>
+      {props => (
+        <div 
+          style={{ marginRight: "4px" }}
+        >
+          <Icon
+            tooltip="Display"
+            name={`Layout${display[0].toUpperCase()}${display.substring(1)}`}
+            style={{ width: "27px", height: "28px"}}
+            onClick={toggleDisplayPopout}
+            popoutProps={props}
+          />
+        </div>
+      )}
+    </Popout>
+  )
+})
 
 module.exports = class PluginList extends React.Component {
   constructor (props) {
     super(props)
     
     this.state = {
-      search: "",
+      search: ""
     }
   }
   render () {
     const plugins = this.__getPlugins()
     let num = 0
+    const Search = BdApi.findModuleByDisplayName("Searchbar")
+    const Flex = BdApi.findModuleByDisplayName("Flex")
+    const display = vizality.api.settings._fluxProps("addon-manager").getSetting("listDisplay", "card")
+
     return (
-      <div className="vz-addons-list" vz-display={vizality.api.settings._fluxProps('addon-manager').getSetting('listDisplay', 'card')}>
-        <div className="vz-sticky-element-wrapper vz-addons-list-sticky-bar-wrapper" style={{top: "42px"}}>
-          <div style={{padding: "12px"}}>
-            <div className="vizality-entities-manage-header">
-              <Button
+      <div className="vz-addons-list" vz-display={display}>
+        <StickyElement className="vz-sticky-element-wrapper vz-addons-list-sticky-bar-wrapper" style={{top: "40px"}}>
+          <Flex>
+            <Flex/>
+            <div style={{ width: "166px", margin: "auto" }}>
+              <Search 
+                size={Search.Sizes.SMALL}
+                placeholder="Search" 
+                query={this.state.search}
+                onChange={(val) => this.setState({search: val})}
+                onClear={() => this.setState({search: ""})}
+              />
+            </div>
+            <div style={{height: "1.8rem", width: "fit-content", padding: "0 0 0 .8rem", display: "flex"}}>
+              <Displaypopout />
+              <Icon 
+                name="Folder" 
                 onClick={() => eleShell.openPath(window.ContentManager.pluginsFolder)}
-                size={Button.Sizes.SMALL}
-                color={Button.Colors.PRIMARY}
-                look={Button.Looks.OUTLINED}
-              >Open Plugins Folder</Button>
+                tooltip="Open Plugins Folder"
+                style={{ width: "24px", height: "28px"}}
+              />
             </div>
-            <div className="vizality-entities-manage-search" style={{marginTop: "12px"}}>
-              <TextInput
-                value={this.state.search}
-                onChange={(val) => this.setState({ search: val })}
-                placeholder="What are you looking for?"
-              >Search plugins</TextInput>
-            </div>
-          </div>
-        </div>
+          </Flex>
+        </StickyElement>
 
         <div className="vz-addons-list-inner">
           <div className="vz-addons-list-items">

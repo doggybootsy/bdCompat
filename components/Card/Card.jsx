@@ -41,11 +41,11 @@ module.exports = class Card extends React.Component {
                     <Anchor 
                       type="user" 
                       userId={this.props.meta?.authorId} 
-                      className='vz-addon-card-author'>{author}</Anchor>
+                      className="vz-addon-card-author">{author}</Anchor>
                   ) : (
                     <Anchor 
                       style={{pointerEvents: "all"}}
-                      className='vz-addon-card-author'
+                      className="vz-addon-card-author"
                       href={this.props.meta.authorLink}>{author}</Anchor>
                   )}
                 </OverflowTooltip>
