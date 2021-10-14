@@ -8,10 +8,11 @@ const FormTitle = getModuleByDisplayName('FormTitle')
 
 module.exports = class PluginSettings extends React.Component {
   renderPluginSettings() {
-    let panel
+    let Panel
     try {
-      panel = this.props.plugin.getSettingsPanel()
-    } catch (e) {
+      Panel = this.props.plugin.getSettingsPanel()
+    } 
+    catch (e) {
       console.error(e)
 
       const error = (e.stack || e.toString()).split('\n')
@@ -26,10 +27,10 @@ module.exports = class PluginSettings extends React.Component {
         </div>
       )
     }
-    if (panel instanceof Node || typeof panel === 'string')
-      return <div ref={el => el ? panel instanceof Node ? el.append(panel) : el.innerHTML = panel : void 0}></div>
+    if (Panel instanceof Node || typeof Panel === 'string')
+      return <div ref={el => el ? Panel instanceof Node ? el.append(Panel) : el.innerHTML = Panel : void 0}></div>
 
-    return typeof panel === 'function' ? React.createElement(panel) : panel
+    return typeof panel === 'function' ? <Panel /> : Panel
   }
 
   render () {
@@ -46,7 +47,7 @@ module.exports = class PluginSettings extends React.Component {
             </div>
           </ModalContent>
           <ModalFooter>
-            <Button.default onClick={() => this.props.modalProps.onClose()}>{Messages.DONE}</Button.default>
+            <Button.default onClick={this.props.modalProps.onClose}>{Messages.DONE}</Button.default>
           </ModalFooter>
         </>
       )
