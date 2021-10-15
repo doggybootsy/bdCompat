@@ -28,7 +28,7 @@ module.exports = class PluginSettings extends React.Component {
       )
     }
     if (panel instanceof Node || typeof panel === 'string')
-      return <div ref={el => el ? el.append(panel) ? el.append(panel) : el.innerHTML = panel : void 0}></div>
+      return <div ref={el => el ? panel instanceof Node ? el.append(panel) : el.innerHTML = panel : void 0}></div>
 
     return typeof panel === 'function' ? React.createElement(panel) : panel
   }
