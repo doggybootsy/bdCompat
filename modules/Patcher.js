@@ -12,13 +12,13 @@ module.exports = class Patcher {
     }
 
     static unpatchAll(patches) {
-        if (typeof patches === 'string') patches = this.getPatchesByCaller(patches)
+        if (typeof patches === "string") patches = this.getPatchesByCaller(patches)
         for (const patch of patches) patch.unpatch()
     }
 
     static resolveModule(module) {
-        if (!module || typeof module === 'function' || (typeof module === 'object' && !Array.isArray(module))) return module
-        if (typeof module === 'string') return DiscordModules[module]
+        if (!module || typeof module === "function" || (typeof module === "object" && !Array.isArray(module))) return module
+        if (typeof module === "string") return DiscordModules[module]
         if (Array.isArray(module)) return BdApi.findModuleByProps(...module)
         return null
     }
@@ -42,15 +42,15 @@ module.exports = class Patcher {
     }
 
     static before(caller, module, functionName, callback, options = {}) {
-        return this.pushChildPatch(caller, module, functionName, callback, { ...options, type: 'before' })
+        return this.pushChildPatch(caller, module, functionName, callback, { ...options, type: "before" })
     }
 
     static instead(caller, module, functionName, callback, options = {}) {
-        return this.pushChildPatch(caller, module, functionName, callback, { ...options, type: 'instead' })
+        return this.pushChildPatch(caller, module, functionName, callback, { ...options, type: "instead" })
     }
 
     static after(caller, module, functionName, callback, options = {}) {
-        return this.pushChildPatch(caller, module, functionName, callback, { ...options, type: 'after' })
+        return this.pushChildPatch(caller, module, functionName, callback, { ...options, type: "after" })
     }
 
     static pushChildPatch(caller, module, functionName, callback, options = {}) {
@@ -58,7 +58,7 @@ module.exports = class Patcher {
         const mdl = this.resolveModule(module)   
         if (!mdl) return null
         if (!mdl[functionName] && forcePatch) mdl[functionName] = function () {}
-        if (typeof mdl[functionName] !== 'function') return null
+        if (typeof mdl[functionName] !== "function") return null
 
         const displayName = options.displayName || module.displayName || module.name || module.constructor.displayName || module.constructor.name
 

@@ -6,37 +6,37 @@ import { getModule, FluxDispatcher } from "@vizality/webpack"
 import { patch, unpatch } from "@vizality/patcher"
 
 // Allow loading from discords node_modules
-Module.globalPaths.push(join(process.resourcesPath, 'app.asar/node_modules'))
+Module.globalPaths.push(join(process.resourcesPath, "app.asar/node_modules"))
 
 module.exports = class BDPluginManager {
   constructor(pluginsFolder, settings) {
     this.folder   = pluginsFolder
     this.settings = settings
 
-    FluxDispatcher.subscribe('CHANNEL_SELECT', this.channelSwitch = () => this.fireEvent('onSwitch'))
+    FluxDispatcher.subscribe("CHANNEL_SELECT", this.channelSwitch = () => this.fireEvent("onSwitch"))
 
     this.observer = new MutationObserver((mutations) => {
-        for (let i = 0, mlen = mutations.length; i < mlen; i++) this.fireEvent('observer', mutations[i])
+        for (let i = 0, mlen = mutations.length; i < mlen; i++) this.fireEvent("observer", mutations[i])
     })
     this.observer.observe(document, { childList: true, subtree: true })
 
     // Wait for jQuery, then load the plugins
-    window.BdApi.linkJS('jquery', '//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js')
+    window.BdApi.linkJS("jquery", "//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js")
       .then(async () => {
-        this.__log('Loaded jQuery')
+        this.__log("Loaded jQuery")
 
         if (!window.jQuery) {
-          Object.defineProperty(window, 'jQuery', {
+          Object.defineProperty(window, "jQuery", {
             get: () => webFrame.top.context.window.jQuery
           })
           window.$ = window.jQuery
         }
 
-        const ConnectionStore = await getModule('isTryingToConnect', 'isConnected')
+        const ConnectionStore = await getModule("isTryingToConnect", "isConnected")
         const listener = () => {
           if (!ConnectionStore.isConnected()) return
           ConnectionStore.removeChangeListener(listener)
-          this.__log('Loading plugins..')
+          this.__log("Loading plugins..")
           this.loadAllPlugins()
           this.startAllEnabledPlugins()
         }
@@ -46,8 +46,8 @@ module.exports = class BDPluginManager {
   }
 
   destroy () {
-    window.BdApi.unlinkJS('jquery')
-    if (this.channelSwitch) FluxDispatcher.unsubscribe('CHANNEL_SELECT', this.channelSwitch)
+    window.BdApi.unlinkJS("jquery")
+    if (this.channelSwitch) FluxDispatcher.unsubscribe("CHANNEL_SELECT", this.channelSwitch)
 
     this.observer.disconnect()
     this.stopAllPlugins()
@@ -58,7 +58,7 @@ module.exports = class BDPluginManager {
     const plugins = Object.keys(window.bdplugins)
 
     plugins.forEach((pluginName) => {
-      if (window.BdApi.loadData('BDCompat-EnabledPlugins', pluginName) === true) this.startPlugin(pluginName)
+      if (window.BdApi.loadData("BDCompat-EnabledPlugins", pluginName) === true) this.startPlugin(pluginName)
     })
   }
 
@@ -92,7 +92,7 @@ module.exports = class BDPluginManager {
     } catch (err) {
       this.__error(err, `Could not start ${plugin.plugin.getName()}`)
       BdApi.showToast(`Couldn't start ${pluginName}`, {type: "success"})
-      window.BdApi.saveData('BDCompat-EnabledPlugins', plugin.plugin.getName(), false)
+      window.BdApi.saveData("BDCompat-EnabledPlugins", plugin.plugin.getName(), false)
     }
   }
   stopPlugin (pluginName) {
@@ -107,8 +107,8 @@ module.exports = class BDPluginManager {
       this.__log(`Stopped plugin ${plugin.plugin.getName()}`)
     } catch (err) {
       this.__error(err, `Could not stop ${plugin.plugin.getName()}`)
-      if (this.settings.get('disableWhenStopFailed'))
-        window.BdApi.saveData('BDCompat-EnabledPlugins', plugin.plugin.getName(), false)
+      if (this.settings.get("disableWhenStopFailed"))
+        window.BdApi.saveData("BDCompat-EnabledPlugins", plugin.plugin.getName(), false)
     }
   }
   reloadPlugin (pluginName) {
@@ -128,21 +128,21 @@ module.exports = class BDPluginManager {
     const plugin = window.bdplugins[pluginName]
     if (!plugin) return this.__error(null, `Tried to enable a missing plugin: ${pluginName}`)
 
-    window.BdApi.saveData('BDCompat-EnabledPlugins', plugin.plugin.getName(), true)
+    window.BdApi.saveData("BDCompat-EnabledPlugins", plugin.plugin.getName(), true)
     this.startPlugin(pluginName)
   }
   disablePlugin (pluginName) {
     const plugin = window.bdplugins[pluginName]
     if (!plugin) return this.__error(null, `Tried to disable a missing plugin: ${pluginName}`)
-    window.BdApi.saveData('BDCompat-EnabledPlugins', plugin.plugin.getName(), false)
+    window.BdApi.saveData("BDCompat-EnabledPlugins", plugin.plugin.getName(), false)
     this.stopPlugin(pluginName)
     BdApi.showToast(`Disabled ${pluginName}`, {type: "success"})
   }
 
   loadAllPlugins() {
     const plugins = readdirSync(this.folder)
-      .filter((pluginFile) => pluginFile.endsWith('.plugin.js'))
-      .map((pluginFile) => pluginFile.slice(0, -('.plugin.js'.length)))
+      .filter((pluginFile) => pluginFile.endsWith(".plugin.js"))
+      .map((pluginFile) => pluginFile.slice(0, -(".plugin.js".length)))
 
     plugins.forEach((pluginName) => this.loadPlugin(pluginName))
   }
@@ -161,11 +161,11 @@ module.exports = class BDPluginManager {
         delete window.bdplugins[plugin.getName()]
         window.bdplugins[plugin.getName()] = { plugin, __filePath: pluginPath, ...meta }
 
-        if (plugin.load && typeof plugin.load === 'function')
+        if (plugin.load && typeof plugin.load === "function")
           try {
             plugin.load()
 
-            if (pluginName === '0PluginLibrary') this.__patchZLibPatcher()
+            if (pluginName === "0PluginLibrary") this.__patchZLibPatcher()
           } catch (err) {
             this.__error(err, `Failed to preload ${plugin.getName()}`)
           }
@@ -184,7 +184,7 @@ module.exports = class BDPluginManager {
     if (!plugin) return this.__error(null, `Tried to delete a missing plugin: ${pluginName}`)
 
     this.disablePlugin(pluginName)
-    if (typeof plugin.plugin.unload === 'function') plugin.plugin.unload()
+    if (typeof plugin.plugin.unload === "function") plugin.plugin.unload()
     delete window.bdplugins[pluginName]
 
     unlinkSync(plugin.__filePath)
@@ -193,7 +193,7 @@ module.exports = class BDPluginManager {
   fireEvent (event, ...args) {
     for (const plug in window.bdplugins) {
       const p = window.bdplugins[plug], { plugin } = p
-      if (!p.__started || !plugin[event] || typeof plugin[event] !== 'function') continue
+      if (!p.__started || !plugin[event] || typeof plugin[event] !== "function") continue
 
       try {
         plugin[event](...args)
@@ -205,9 +205,9 @@ module.exports = class BDPluginManager {
 
   addMissingGetMethods(pluginName, meta, plugin) {
     if (!plugin.getName) plugin.getName = () => meta.name || pluginName
-    if (!plugin.getDescription) plugin.getDescription = () => meta.description || ''
-    if (!plugin.getVersion) plugin.getVersion = () => meta.version || '0.0.0'
-    if (!plugin.getAuthor) plugin.getAuthor = () => meta.author || meta.authorId || 'Unknown'
+    if (!plugin.getDescription) plugin.getDescription = () => meta.description || ""
+    if (!plugin.getVersion) plugin.getVersion = () => meta.version || "0.0.0"
+    if (!plugin.getAuthor) plugin.getAuthor = () => meta.author || meta.authorId || "Unknown"
   }
 
 
@@ -216,20 +216,20 @@ module.exports = class BDPluginManager {
     this.__unpatchZLibPatcher()
 
     const _window = webFrame.top.context.window
-    if (!window?.ZLibrary?.Patcher) return this.__error(null, 'Failed to patch ZLibrary Patcher')
+    if (!window?.ZLibrary?.Patcher) return this.__error(null, "Failed to patch ZLibrary Patcher")
 
     const origFunction = Function
-    patch('bdCompat-zlib-patcher-pre', window.ZLibrary.Patcher, 'pushChildPatch', (args) => {
+    patch("bdCompat-zlib-patcher-pre", window.ZLibrary.Patcher, "pushChildPatch", (args) => {
       const orig = args[1]?.[args[2]]
       if (orig && !(orig instanceof origFunction) && orig instanceof _window.Function) window.Function = _window.Function
     }, true)
-    patch('bdCompat-zlib-patcher', window.ZLibrary.Patcher, 'pushChildPatch', () => window.Function = origFunction)
+    patch("bdCompat-zlib-patcher", window.ZLibrary.Patcher, "pushChildPatch", () => window.Function = origFunction)
 
-    this.__log('Patched ZLibrary Patcher')
+    this.__log("Patched ZLibrary Patcher")
   }
   __unpatchZLibPatcher() {
-    unpatch('bdCompat-zlib-patcher-pre')
-    unpatch('bdCompat-zlib-patcher')
+    unpatch("bdCompat-zlib-patcher-pre")
+    unpatch("bdCompat-zlib-patcher")
   }
 
 
@@ -239,18 +239,18 @@ module.exports = class BDPluginManager {
   
 
   __log (...message) {
-    console.log('%c[BDCompat:BDPluginManager]', 'color: #3a71c1;', ...message)
+    console.log("%c[BDCompat:BDPluginManager]", "color: #3a71c1;", ...message)
   }
 
   __warn (...message) {
-    console.warn('%c[BDCompat:BDPluginManager]', 'color: #e8a400;', ...message)
+    console.warn("%c[BDCompat:BDPluginManager]", "color: #e8a400;", ...message)
   }
 
   __error (error, ...message) {
-    console.error('%c[BDCompat:BDPluginManager]', 'color: red;', ...message)
+    console.error("%c[BDCompat:BDPluginManager]", "color: red;", ...message)
 
     if (error) {
-      console.groupCollapsed(`%cError: ${error.message}`, 'color: red;')
+      console.groupCollapsed(`%cError: ${error.message}`, "color: red;")
       console.error(error.stack)
       console.groupEnd()
     }

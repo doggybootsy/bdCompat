@@ -16,22 +16,22 @@ module.exports = class PluginSettings extends React.Component {
     } catch (e) {
       console.error(e)
 
-      const error = (e.stack || e.toString()).split('\n')
-        .filter(l => !l.includes('discordapp.com/assets/') && !l.includes('discord.com/assets/'))
-        .join('\n')
-        .split(resolve(__dirname, '..', '..')).join('')
+      const error = (e.stack || e.toString()).split("\n")
+        .filter(l => !l.includes("discordapp.com/assets/") && !l.includes("discord.com/assets/"))
+        .join("\n")
+        .split(resolve(__dirname, "..", "..")).join("")
 
       return (
-        <div className='vizality-text vizality-settings-error'>
+        <div className="vizality-text vizality-settings-error">
           <div>An error occurred while rendering settings panel.</div>
           <code>{error}</code>
         </div>
       )
     }
-    if (panel instanceof Node || typeof panel === 'string')
+    if (panel instanceof Node || typeof panel === "string")
       return <div ref={el => el ? panel instanceof Node ? el.append(panel) : el.innerHTML = panel : void 0}></div>
 
-    return typeof panel === 'function' ? React.createElement(panel) : panel
+    return typeof panel === "function" ? React.createElement(panel) : panel
   }
 
   render () {
@@ -49,7 +49,7 @@ module.exports = class PluginSettings extends React.Component {
             </Flex>
           </ModalHeader>
           <ModalContent>
-            <div className='plugin-settings' id={`plugin-settings-${name}`}>
+            <div className="plugin-settings" id={`plugin-settings-${name}`}>
               {this.renderPluginSettings()}
             </div>
           </ModalContent>

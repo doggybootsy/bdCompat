@@ -6,7 +6,7 @@ import { randomBytes } from "crypto"
 
 import Patcher from "./Patcher"
 
-const { getOwnerInstance, getReactInstance } = require('@vizality/util').react
+const { getOwnerInstance, getReactInstance } = require("@vizality/util").react
 
 const PluginData = {}
 
@@ -29,10 +29,10 @@ class BdApi {
     return null
   }
   static escapeID (id) {
-    return id.replace(/^[^a-z]+|[^\w-]+/giu, '')
+    return id.replace(/^[^a-z]+|[^\w-]+/giu, "")
   }
 
-  static suppressErrors (method, message = '') {
+  static suppressErrors (method, message = "") {
     return (...params) => {
       try {
         return method(...params)
@@ -54,11 +54,11 @@ class BdApi {
 
   // Style tag
   static get __styleParent () {
-    return BdApi.__elemParent('style')
+    return BdApi.__elemParent("style")
   }
 
   static injectCSS (id, css) {
-    const style = document.createElement('style')
+    const style = document.createElement("style")
 
     style.id = `bd-style-${BdApi.escapeID(id)}`
     style.innerHTML = css
@@ -74,16 +74,16 @@ class BdApi {
 
   // Script tag
   static get __scriptParent () {
-    return BdApi.__elemParent('script')
+    return BdApi.__elemParent("script")
   }
 
   static linkJS (id, url) {
     return new Promise((resolve) => {
-      const script = document.createElement('script')
+      const script = document.createElement("script")
 
       script.id = `bd-script-${BdApi.escapeID(id)}`
       script.src = url
-      script.type = 'text/javascript'
+      script.type = "text/javascript"
       script.onload = resolve
 
       BdApi.__scriptParent.append(script)
@@ -102,13 +102,13 @@ class BdApi {
   }
 
   static __getPluginConfigPath (pluginName) {
-    return join(__dirname, '..', 'config', pluginName + '.config.json')
+    return join(__dirname, "..", "config", pluginName + ".config.json")
   }
 
   static __getPluginConfig (pluginName) {
     const configPath = BdApi.__getPluginConfigPath(pluginName)
 
-    if (typeof BdApi.__pluginData[pluginName] === 'undefined')
+    if (typeof BdApi.__pluginData[pluginName] === "undefined")
       if (!existsSync(configPath)) {
         BdApi.__pluginData[pluginName] = {}
       } else {
@@ -126,7 +126,7 @@ class BdApi {
 
   static __savePluginConfig (pluginName) {
     const configPath = BdApi.__getPluginConfigPath(pluginName)
-    const configFolder = join(__dirname, '..', 'config/')
+    const configFolder = join(__dirname, "..", "config/")
 
     if (!existsSync(configFolder)) mkdirSync(configFolder)
     writeFileSync(configPath, JSON.stringify(BdApi.__pluginData[pluginName], null, 2))
@@ -145,7 +145,7 @@ class BdApi {
 
 
   static saveData (pluginName, key, value) {
-    if (typeof value === 'undefined') return
+    if (typeof value === "undefined") return
 
     const config = BdApi.__getPluginConfig(pluginName)
 
@@ -161,7 +161,7 @@ class BdApi {
   static deleteData (pluginName, key) {
     const config = BdApi.__getPluginConfig(pluginName)
 
-    if (typeof config[key] === 'undefined') return
+    if (typeof config[key] === "undefined") return
     delete config[key]
 
     BdApi.__savePluginConfig(pluginName)
@@ -206,54 +206,54 @@ class BdApi {
 }
 
   static showToast (content, options = {}) {
-    const { type = '', icon = true, timeout = 3000 } = options
+    const { type = "", icon = true, timeout = 3000 } = options
 
-    const toastElem = document.createElement('div')
-    toastElem.classList.add('bd-toast')
+    const toastElem = document.createElement("div")
+    toastElem.classList.add("bd-toast")
     toastElem.innerText = content
 
     if (type) toastElem.classList.add(`toast-${type}`)
-    if (type && icon) toastElem.classList.add('icon')
+    if (type && icon) toastElem.classList.add("icon")
 
     const toastWrapper = BdApi.__createToastWrapper()
     toastWrapper.appendChild(toastElem)
 
     setTimeout(() => {
-      toastElem.classList.add('closing')
+      toastElem.classList.add("closing")
 
       setTimeout(() => {
         toastElem.remove()
-        if (!document.querySelectorAll('.bd-toasts .bd-toast').length) toastWrapper.remove()
+        if (!document.querySelectorAll(".bd-toasts .bd-toast").length) toastWrapper.remove()
       }, 300)
     }, timeout)
   }
 
   static __createToastWrapper () {
-    const toastWrapperElem = document.querySelector('.bd-toasts')
+    const toastWrapperElem = document.querySelector(".bd-toasts")
 
     if (!toastWrapperElem) {
       const DiscordElements = {
-        settings: '.contentColumn-2hrIYH, .customColumn-Rb6toI',
-        chat: '.chat-3bRxxu form',
-        friends: '.container-3gCOGc',
-        serverDiscovery: '.pageWrapper-1PgVDX',
-        applicationStore: '.applicationStore-1pNvnv',
-        gameLibrary: '.gameLibrary-TTDw4Y',
-        activityFeed: '.activityFeed-28jde9',
+        settings: ".contentColumn-2hrIYH, .customColumn-Rb6toI",
+        chat: ".chat-3bRxxu form",
+        friends: ".container-3gCOGc",
+        serverDiscovery: ".pageWrapper-1PgVDX",
+        applicationStore: ".applicationStore-1pNvnv",
+        gameLibrary: ".gameLibrary-TTDw4Y",
+        activityFeed: ".activityFeed-28jde9",
       }
 
-      const boundingElement = document.querySelector(Object.keys(DiscordElements).map((component) => DiscordElements[component]).join(', '))
+      const boundingElement = document.querySelector(Object.keys(DiscordElements).map((component) => DiscordElements[component]).join(", "))
 
-      const toastWrapper = document.createElement('div')
-      toastWrapper.classList.add('bd-toasts')
-      toastWrapper.style.setProperty('width', boundingElement ? boundingElement.offsetWidth + 'px' : '100%')
-      toastWrapper.style.setProperty('left', boundingElement ? boundingElement.getBoundingClientRect().left + 'px' : '0px')
+      const toastWrapper = document.createElement("div")
+      toastWrapper.classList.add("bd-toasts")
+      toastWrapper.style.setProperty("width", boundingElement ? `${boundingElement.offsetWidth}px` : "100%")
+      toastWrapper.style.setProperty("left", boundingElement ? boundingElement.getBoundingClientRect().left + "px" : "0px")
       toastWrapper.style.setProperty(
-        'bottom',
-        (document.querySelector(DiscordElements.chat) ? document.querySelector(DiscordElements.chat).offsetHeight + 20 : 80) + 'px'
+        "bottom",
+        (document.querySelector(DiscordElements.chat) ? document.querySelector(DiscordElements.chat).offsetHeight + 20 : 80) + "px"
       )
 
-      document.querySelector('#app-mount > div[class^="app-"]').appendChild(toastWrapper)
+      document.querySelector("#app-mount > div[class^=\"app-\"]").appendChild(toastWrapper)
 
       return toastWrapper
     }
@@ -296,11 +296,11 @@ class BdApi {
   }
 
   static findModuleByProps(...props) {
-    return BdApi.findModule((module) => props.every((prop) => typeof module[prop] !== 'undefined'))
+    return BdApi.findModule((module) => props.every((prop) => typeof module[prop] !== "undefined"))
   }
 
   static findModuleByPrototypes(...protos) {
-    return getModule(module => module.prototype && protos.every(proto => typeof module.prototype[proto] !== 'undefined'), false)
+    return getModule(module => module.prototype && protos.every(proto => typeof module.prototype[proto] !== "undefined"), false)
   }
 
   static findModuleByDisplayName(displayName) {
@@ -309,9 +309,9 @@ class BdApi {
 
   static monkeyPatch (what, methodName, options = {}) {
     const displayName = options.displayName || what.displayName || what[methodName].displayName
-      || what.name || what.constructor.displayName || what.constructor.name || 'MissingName'
+      || what.name || what.constructor.displayName || what.constructor.name || "MissingName"
 
-    // if (options.instead) return BdApi.__warn('Powercord API currently does not support replacing the entire method!')
+    // if (options.instead) return BdApi.__warn("Powercord API currently does not support replacing the entire method!")
 
     if (!what[methodName])
       if (options.force) {
@@ -344,7 +344,7 @@ class BdApi {
         if (tempRet !== undefined) data.returnValue = tempRet
         return data.returnValue
       }
-      if (displayName != 'MissingName') what[methodName].displayName = displayName
+      if (displayName != "MissingName") what[methodName].displayName = displayName
       return cancel
     }
   
@@ -352,7 +352,7 @@ class BdApi {
     const patches = []
     if (options.before) patches.push(BdApi.__injectBefore({ what, methodName, options, displayName }, origMethod))
     if (options.after) patches.push(BdApi.__injectAfter({ what, methodName, options, displayName }, origMethod))
-    if (displayName != 'MissingName') what[methodName].displayName = displayName
+    if (displayName != "MissingName") what[methodName].displayName = displayName
 
     const finalCancelPatch = () => patches.forEach((patch) => patch())
 
@@ -360,7 +360,7 @@ class BdApi {
   }
 
   static __injectBefore (data, origMethod) {
-    const patchID = `bd-patch-before-${data.displayName.toLowerCase()}-${randomBytes(4).toString('hex')}`
+    const patchID = `bd-patch-before-${data.displayName.toLowerCase()}-${randomBytes(4).toString("hex")}`
 
     const cancelPatch = () => {
       if (!data.options.silent) BdApi.__log(`Unpatching before of ${data.displayName} ${data.methodName}`)
@@ -393,7 +393,7 @@ class BdApi {
   }
 
   static __injectAfter (data, origMethod) {
-    const patchID = `bd-patch-after-${data.displayName.toLowerCase()}-${randomBytes(4).toString('hex')}`
+    const patchID = `bd-patch-after-${data.displayName.toLowerCase()}-${randomBytes(4).toString("hex")}`
 
     const cancelPatch = () => {
       if (!data.options.silent) BdApi.__log(`Unpatching after of ${data.displayName} ${data.methodName}`)
@@ -458,18 +458,18 @@ class BdApi {
   }
 
   static __log (...message) {
-    console.log('%c[BDCompat:BdApi]', 'color: #3a71c1;', ...message)
+    console.log("%c[BDCompat:BdApi]", "color: #3a71c1;", ...message)
   }
 
   static __warn (...message) {
-    console.log('%c[BDCompat:BdApi]', 'color: #e8a400;', ...message)
+    console.log("%c[BDCompat:BdApi]", "color: #e8a400;", ...message)
   }
 
   static __error (error, ...message) {
-    console.log('%c[BDCompat:BdApi]', 'color: red;', ...message)
+    console.log("%c[BDCompat:BdApi]", "color: red;", ...message)
 
     if (error) {
-      console.groupCollapsed(`%cError: ${error.message}`, 'color: red;')
+      console.groupCollapsed(`%cError: ${error.message}`, "color: red;")
       console.error(error.stack)
       console.groupEnd()
     }

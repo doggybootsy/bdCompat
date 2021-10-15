@@ -2,22 +2,22 @@ import { join, dirname, resolve, basename } from "path"
 import { Module } from "module"
 import { existsSync, mkdirSync, readFileSync } from "fs"
 
-const originalRequire = Module._extensions['.js']
+const originalRequire = Module._extensions[".js"]
 let _this
 
 // Purposefully incomplete ContentManager
 module.exports = class ContentManager {
   constructor() {
     _this = this
-    Module._extensions['.js'] = this.getContentRequire()
+    Module._extensions[".js"] = this.getContentRequire()
   }
 
   destroy() {
-    Module._extensions['.js'] = originalRequire
+    Module._extensions[".js"] = originalRequire
   }
 
   get pluginsFolder() {
-    const pluginDir = join(__dirname, '..', 'plugins')
+    const pluginDir = join(__dirname, "..", "plugins")
 
     if (!existsSync(pluginDir)) mkdirSync(pluginDir)
 
@@ -26,7 +26,7 @@ module.exports = class ContentManager {
 
   get themesFolder() {
     // We'll just pretend it exists.
-    return join(ContentManager.pluginsFolder, '..', 'themes')
+    return join(ContentManager.pluginsFolder, "..", "themes")
   }
 
   extractMeta(content) {
@@ -35,18 +35,18 @@ module.exports = class ContentManager {
     if (hasOldMeta) return this.parseOldMeta(content)
     const hasNewMeta = firstLine.includes("/**")
     if (hasNewMeta) return this.parseNewMeta(content)
-    throw new Error('META was not found.')
+    throw new Error("META was not found.")
   }
 
   parseOldMeta(content) {
-    const metaLine = content.split('\n')[0]
-    const rawMeta = metaLine.substring(metaLine.lastIndexOf('//META') + 6, metaLine.lastIndexOf('*//'))
+    const metaLine = content.split("\n")[0]
+    const rawMeta = metaLine.substring(metaLine.lastIndexOf("//META") + 6, metaLine.lastIndexOf("*//"))
 
-    if (metaLine.indexOf('META') < 0) throw new Error('META was not found.')
-    if (!window.BdApi.testJSON(rawMeta)) throw new Error('META could not be parsed')
+    if (metaLine.indexOf("META") < 0) throw new Error("META was not found.")
+    if (!window.BdApi.testJSON(rawMeta)) throw new Error("META could not be parsed")
 
     const parsed = JSON.parse(rawMeta)
-    if (!parsed.name) throw new Error('META missing name data')
+    if (!parsed.name) throw new Error("META missing name data")
     parsed.format = "json"
 
     return parsed
@@ -75,11 +75,11 @@ module.exports = class ContentManager {
 
   getContentRequire() {
     return function (module, filename) {
-      if (!filename.endsWith('.plugin.js') ||
-        dirname(filename) !== resolve(bdConfig.dataPath, 'plugins'))
+      if (!filename.endsWith(".plugin.js") ||
+        dirname(filename) !== resolve(bdConfig.dataPath, "plugins"))
         return originalRequire.apply(this, arguments)
 
-      let content = readFileSync(filename, 'utf8');
+      let content = readFileSync(filename, "utf8");
       if (content.charCodeAt(0) === 0xFEFF) content = content.slice(1) // Strip BOM
       const meta = _this.extractMeta(content)
       meta.filename = basename(filename)
