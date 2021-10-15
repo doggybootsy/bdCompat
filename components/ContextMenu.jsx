@@ -1,11 +1,14 @@
 import { ContextMenu as Contextmenu } from "@vizality/components"
-import { contextMenu, React, getModule } from "@vizality/webpack"
+import { contextMenu, getModule } from "@vizality/webpack"
 import SettingsModal from "./PluginSettings.jsx"
+
+import React from "react"
 
 const { openModal } = getModule("openModal")
 const { ModalRoot, ModalSize } = getModule("ModalRoot")
 
 const { closeContextMenu } = contextMenu
+
 
 module.exports = class ContextMenu extends React.Component {
   constructor(props) {
@@ -35,7 +38,7 @@ module.exports = class ContextMenu extends React.Component {
         <Contextmenu.Separator />
         <Contextmenu.Item 
           id="Uninstall"
-          label={`Uninstall ${name}`}
+          label="Uninstall"
           color={Contextmenu.Item.Colors.DANGER}
           action={() => BdApi.showConfirmationModal(
             `Uninstall ${name}`,

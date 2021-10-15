@@ -5,14 +5,14 @@ const { ModalHeader, ModalContent, ModalCloseButton, ModalFooter } = getModule("
 const { Messages } = getModule(["Messages"])
 const Button = getModule(["ButtonLooks"])
 const FormTitle = getModuleByDisplayName('FormTitle')
+const Flex = BdApi.findModuleByDisplayName("Flex")
 
 module.exports = class PluginSettings extends React.Component {
   renderPluginSettings() {
-    let Panel
+    let panel
     try {
-      Panel = this.props.plugin.getSettingsPanel()
-    } 
-    catch (e) {
+      panel = this.props.plugin.getSettingsPanel()
+    } catch (e) {
       console.error(e)
 
       const error = (e.stack || e.toString()).split('\n')
@@ -27,27 +27,30 @@ module.exports = class PluginSettings extends React.Component {
         </div>
       )
     }
-    if (Panel instanceof Node || typeof Panel === 'string')
-      return <div ref={el => el ? Panel instanceof Node ? el.append(Panel) : el.innerHTML = Panel : void 0}></div>
+    if (panel instanceof Node || typeof panel === 'string')
+      return <div ref={el => el ? el.append(panel) ? el.append(panel) : el.innerHTML = panel : void 0}></div>
 
-    return typeof panel === 'function' ? <Panel /> : Panel
+    return typeof panel === 'function' ? React.createElement(panel) : panel
   }
 
   render () {
-    const { plugin } = this.props
+    const name = (this.props.plugin.getName() || this.props.meta.name) ?? "No author"
+    const version = (this.props.plugin.getVersion() || this.props.meta.version) ?? "No version"
     try {
       return (
         <>
           <ModalHeader separator={false}>
-            <FormTitle tag={FormTitle.Tags.H4}>{plugin.getName()} Settings</FormTitle>
+            <Flex>
+              <FormTitle tag={FormTitle.Tags.H2}>{name} Settings</FormTitle>
+            </Flex>
           </ModalHeader>
           <ModalContent>
-            <div className='plugin-settings' id={`plugin-settings-${plugin.getName()}`}>
+            <div className='plugin-settings' id={`plugin-settings-${name}`}>
               {this.renderPluginSettings()}
             </div>
           </ModalContent>
           <ModalFooter>
-            <Button.default onClick={this.props.modalProps.onClose}>{Messages.DONE}</Button.default>
+            <Button.default onClick={() => this.props.modalProps.onClose()}>{Messages.DONE}</Button.default>
           </ModalFooter>
         </>
       )

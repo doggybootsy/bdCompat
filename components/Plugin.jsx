@@ -1,4 +1,4 @@
-import { React, contextMenu, getModule } from "@vizality/webpack"
+import { React, contextMenu } from "@vizality/webpack"
 import Cards from "./Card"
 import ContextMenu from "./ContextMenu"
 

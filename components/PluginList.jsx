@@ -6,7 +6,6 @@ import { useToggle } from "@vizality/hooks"
 import DisplayPopout from "./Popout"
 import Plugin from "./Plugin.jsx"
 
-
 const Displaypopout = memo(({}) => {
   const [ showDisplayPopout, toggleDisplayPopout ] = useToggle(false)
 
@@ -89,6 +88,7 @@ module.exports = class PluginList extends React.Component {
                   />
                 }
               )}
+              {Array.from({length: 8}, (_,i) => i).map(e => <div className="vz-addon-card vz-addon-card-filler"/>)}
           </div>
         </div>
       </div>
