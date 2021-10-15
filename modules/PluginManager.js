@@ -58,16 +58,12 @@ module.exports = class BDPluginManager {
     const plugins = Object.keys(window.bdplugins)
 
     plugins.forEach((pluginName) => {
-      if (window.BdApi.loadData("BDCompat-EnabledPlugins", pluginName) === true) this.startPlugin(pluginName)
+      if (window.BdApi.loadData("BDCompat-EnabledPlugins", pluginName)) this.startPlugin(pluginName)
     })
   }
 
   stopAllPlugins () {
-    const plugins = Object.keys(window.bdplugins)
-
-    plugins.forEach((pluginName) => {
-      this.stopPlugin(pluginName)
-    })
+    for (const pluginName of Object.keys(window.bdplugins)) this.stopPlugin(pluginName)
   }
 
 

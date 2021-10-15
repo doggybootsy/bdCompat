@@ -17,13 +17,10 @@ export default memo(({ display, setDisplay, onClose }) => {
                   name={`Layout${layout[0].toUpperCase()}${layout.substring(1)}`}
                   size="18" 
                 />
-                {e[0].toUpperCase()}{layout.substring(1)}
+                {layout[0].toUpperCase()}{layout.substring(1)}
               </div>
             )}
-            action={() => {
-              setDisplay(layout)
-              vizality.api.settings._fluxProps("addon-manager").updateSetting("listDisplay", layout)
-            }}
+            action={() => setDisplay(layout)}
           />
         ))}
       </ContextMenu.Group>

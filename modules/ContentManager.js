@@ -31,10 +31,8 @@ module.exports = class ContentManager {
 
   extractMeta(content) {
     const firstLine = content.split("\n")[0]
-    const hasOldMeta = firstLine.includes("//META")
-    if (hasOldMeta) return this.parseOldMeta(content)
-    const hasNewMeta = firstLine.includes("/**")
-    if (hasNewMeta) return this.parseNewMeta(content)
+    if (firstLine.includes("//META")) return this.parseOldMeta(content)
+    if (firstLine.includes("/**")) return this.parseNewMeta(content)
     throw new Error("META was not found.")
   }
 

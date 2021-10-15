@@ -9,8 +9,13 @@ import Plugin from "./Plugin.jsx"
 const Displaypopout = memo(({}) => {
   const [ showDisplayPopout, toggleDisplayPopout ] = useToggle(false)
 
-  const [ display, setDisplay ] = useState(vizality.api.settings._fluxProps("addon-manager").getSetting("listDisplay", "card"))
+  const [ display, setDisplayR ] = useState(vizality.api.settings._fluxProps("addon-manager").getSetting("listDisplay", "card"))
   
+  function setDisplay(layout) {
+    setDisplayR(layout)
+    vizality.api.settings._fluxProps("addon-manager").updateSetting("listDisplay", layout)
+  }
+
   return (
     <Popout renderPopout={props => <DisplayPopout {...props} display={display} setDisplay={setDisplay} />} position="left" animation="2" shouldShow={showDisplayPopout} onRequestClose={toggleDisplayPopout}>
       {props => (
@@ -20,7 +25,7 @@ const Displaypopout = memo(({}) => {
           <Icon
             tooltip="Display"
             name={`Layout${display[0].toUpperCase()}${display.substring(1)}`}
-            style={{ width: "27px", height: "28px"}}
+            size="28px"
             onClick={toggleDisplayPopout}
             popoutProps={props}
           />
@@ -35,7 +40,7 @@ module.exports = class PluginList extends React.Component {
     super(props)
     
     this.state = {
-      search: "", page: "installed"
+      search: ""
     }
   }
   render () {
@@ -65,7 +70,7 @@ module.exports = class PluginList extends React.Component {
                   name="Folder" 
                   onClick={() => eleShell.openPath(window.ContentManager.pluginsFolder)}
                   tooltip="Open Plugins Folder"
-                  style={{ width: "24px", height: "28px"}}
+                  size="25px"
                 />
               </div>
             </Flex>
