@@ -1,4 +1,4 @@
-import React, {memo} from "react"
+import React, { memo, useState } from "react"
 import { Icon, StickyElement, Popout } from "@vizality/components"
 import { shell as eleShell } from "electron"
 import { useToggle } from "@vizality/hooks"
@@ -9,10 +9,10 @@ import Plugin from "./Plugin.jsx"
 const Displaypopout = memo(({}) => {
   const [ showDisplayPopout, toggleDisplayPopout ] = useToggle(false)
 
-  const display = vizality.api.settings._fluxProps("addon-manager").getSetting("listDisplay", "card")
+  const [ display, setDisplay ] = useState(vizality.api.settings._fluxProps("addon-manager").getSetting("listDisplay", "card"))
   
   return (
-    <Popout renderPopout={props => <DisplayPopout {...props} />} position="left" animation="2" shouldShow={showDisplayPopout} onRequestClose={toggleDisplayPopout}>
+    <Popout renderPopout={props => <DisplayPopout {...props} display={display} setDisplay={setDisplay} />} position="left" animation="2" shouldShow={showDisplayPopout} onRequestClose={toggleDisplayPopout}>
       {props => (
         <div 
           style={{ marginRight: "4px" }}

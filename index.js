@@ -1,12 +1,11 @@
-const { Plugin } = require('@vizality/entities')
-const process = require('process')
-const { webFrame } = require('electron')
-
-const { AddonAPI, BDApi, ContentManager, PluginManager } = require('./modules')
+import { Plugin } from "@vizality/entities"
+import { env } from "process"
+import { webFrame } from "electron"
+import { AddonAPI, BDApi, ContentManager, PluginManager } from "./modules"
 
 module.exports = class BDCompat extends Plugin {
   start () {
-    this.injectStyles('style.css')
+    this.injectStyles("style.css")
     this.defineGlobals()
   }
 
@@ -21,48 +20,43 @@ module.exports = class BDCompat extends Plugin {
     window.settingsCookie = {}
 
     window.bdplugins = {}
-    window.pluginCookie = {}
     window.bdpluginErrors = []
 
     window.bdthemes = {}
     window.themeCookie = {}
     window.bdthemeErrors = []
 
-    // window.BdApi = BDApi
-
-    // Orignally BdApi is an object, not a class
     window.BdApi = {}
-    Object.getOwnPropertyNames(BDApi).filter(m => typeof BDApi[m] == 'function' || typeof BDApi[m] == 'object').forEach(m => {
-      window.BdApi[m] = BDApi[m]
-    })
+    Object.getOwnPropertyNames(BDApi).filter(m => typeof BDApi[m] == "function" || typeof BDApi[m] == "object").forEach(m => window.BdApi[m] = BDApi[m])
     window.Utils = { monkeyPatch: BDApi.monkeyPatch, suppressErrors: BDApi.suppressErrors, escapeID: BDApi.escapeID }
 
     window.ContentManager = new ContentManager
     window.pluginModule   = new PluginManager(window.ContentManager.pluginsFolder, this.settings)
 
-    // DevilBro's plugins checks whether or not it's running on ED
-    // This isn't BetterDiscord, so we'd be better off doing this.
-    // eslint-disable-next-line no-process-env
-    process.env.injDir = __dirname
+    env.injDir = __dirname
 
     window.BdApi.Plugins = new AddonAPI(window.bdplugins, window.pluginModule)
     window.BdApi.Themes  = new AddonAPI({}, {})
 
+    // Expose to top, not needed but nice
     webFrame.top.context.BdApi = window.BdApi
-    this.log('Defined BetterDiscord globals')
   }
 
   destroyGlobals () {
-    const globals = ['bdConfig', 'settingsCookie', 'bdplugins', 'pluginCookie', 'bdpluginErrors', 'bdthemes',
-      'themeCookie', 'bdthemeErrors', 'BdApi', 'Utils', 'ContentManager', 'pluginModule']
+    [
+      "bdConfig", 
+      "settingsCookie", 
+      "bdplugins", 
+      "bdpluginErrors", 
+      "bdthemes",
+      "themeCookie", 
+      "bdthemeErrors", 
+      "BdApi", 
+      "Utils", 
+      "ContentManager", 
+      "pluginModule"
+    ].forEach(g => delete window[g])
 
-    globals.forEach(g => {
-      delete window[g]
-    })
-
-    // eslint-disable-next-line no-process-env
-    delete process.env.injDir
-
-    this.log('Destroyed BetterDiscord globals')
+    delete env.injDir
   }
 }

@@ -1,11 +1,9 @@
 import { ContextMenu, Icon } from "@vizality/components"
-import React, { useState, memo } from "react"
+import React, { memo } from "react"
 
 const Items = ["compact","cover","card","list"]
 
-export default memo(({ onClose }) => {
-  const [ display, setDisplay ] = useState(vizality.api.settings._fluxProps("addon-manager").getSetting("listDisplay", "card"));
-
+export default memo(({ display, setDisplay, onClose }) => {
   return (
     <ContextMenu.Menu navId="vz-addons-list-display-menu" onClose={onClose}>
       <ContextMenu.Group label="Layout">

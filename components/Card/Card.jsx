@@ -60,7 +60,7 @@ module.exports = class Card extends React.Component {
                       size={Button.ButtonSizes.ICON}
                       color={Button.ButtonColors.RED}
                       onClick={() => BdApi.showConfirmationModal(
-                      `Uninstall ${name}`, 
+                        `Uninstall ${name}`, 
                         [`Are you sure you wan't to uninstall ${name}`], 
                         {
                           danger: true, 

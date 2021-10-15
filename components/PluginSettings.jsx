@@ -1,11 +1,12 @@
-import { React, getModuleByDisplayName, getModule } from "@vizality/webpack"
+import { React } from "@vizality/webpack"
 import { resolve } from "path"
 
-const { ModalHeader, ModalContent, ModalCloseButton, ModalFooter } = getModule("ModalRoot")
-const { Messages } = getModule(["Messages"])
-const Button = getModule(["ButtonLooks"])
-const FormTitle = getModuleByDisplayName('FormTitle')
+const { ModalHeader, ModalContent, ModalCloseButton, ModalFooter } = BdApi.findModuleByProps("ModalRoot")
+const { Messages } = BdApi.findModuleByProps("Messages")
+const Button = BdApi.findModuleByProps("ButtonLooks")
+const Header = BdApi.findModuleByDisplayName("Header")
 const Flex = BdApi.findModuleByDisplayName("Flex")
+const Text = BdApi.findModuleByDisplayName("text")
 
 module.exports = class PluginSettings extends React.Component {
   renderPluginSettings() {
@@ -41,7 +42,10 @@ module.exports = class PluginSettings extends React.Component {
         <>
           <ModalHeader separator={false}>
             <Flex>
-              <FormTitle tag={FormTitle.Tags.H2}>{name} Settings</FormTitle>
+              <Flex.Child>
+                <Header tag="h2">{name} Settings</Header>
+                <Text>{version}</Text>
+              </Flex.Child>
             </Flex>
           </ModalHeader>
           <ModalContent>

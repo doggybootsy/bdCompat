@@ -16,17 +16,12 @@ const PluginData = {}
 
 class BdApi {
   // React
-  static get React () {
-    return React
-  }
-  static get ReactDOM () {
-    return ReactDOM
-  }
+  static get React () {return React}
+
+  static get ReactDOM () {return ReactDOM}
 
   // Patcher
-  static get Patcher() {
-    return Patcher
-  }
+  static get Patcher() {return Patcher}
 
 
   // General
@@ -50,7 +45,6 @@ class BdApi {
   static testJSON (data) {
     try {
       JSON.parse(data)
-
       return true
     } catch (err) {
       return false
