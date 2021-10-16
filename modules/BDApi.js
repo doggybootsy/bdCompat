@@ -4,7 +4,7 @@ import { join } from "path"
 import { existsSync, writeFileSync, mkdirSync, readFileSync } from "fs"
 import { randomBytes } from "crypto"
 
-import Patcher from "./Patcher"
+import { Patcher, DiscordModules } from "."
 
 const { getOwnerInstance, getReactInstance } = require("@vizality/util").react
 
@@ -473,6 +473,9 @@ class BdApi {
       console.error(error.stack)
       console.groupEnd()
     }
+  }
+  static __DiscordModules () {
+    return DiscordModules
   }
 }
 

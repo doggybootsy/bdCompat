@@ -1,3 +1,5 @@
+import { DiscordModules } from "."
+
 module.exports = class Patcher {
     static get patches() { return this._patches || (this._patches = []) }
 
@@ -18,7 +20,7 @@ module.exports = class Patcher {
 
     static resolveModule(module) {
         if (!module || typeof module === "function" || (typeof module === "object" && !Array.isArray(module))) return module
-        if (typeof module === "string") return DiscordModules[module]
+        if (typeof module === "string") return DiscordModules().default[module]
         if (Array.isArray(module)) return BdApi.findModuleByProps(...module)
         return null
     }
