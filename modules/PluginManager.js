@@ -63,7 +63,8 @@ module.exports = class BDPluginManager {
   }
 
   stopAllPlugins () {
-    for (const pluginName of Object.keys(window.bdplugins)) this.stopPlugin(pluginName)
+    for (const pluginName of Object.keys(window.bdplugins)) 
+      this.stopPlugin(pluginName)
   }
 
 
@@ -85,7 +86,8 @@ module.exports = class BDPluginManager {
       plugin.__started = true
       this.__log(`Started plugin ${plugin.plugin.getName()}`)
       BdApi.showToast(`Started ${pluginName}`, {type: "success"})
-    } catch (err) {
+    } 
+    catch (err) {
       this.__error(err, `Could not start ${plugin.plugin.getName()}`)
       BdApi.showToast(`Couldn't start ${pluginName}`, {type: "success"})
       window.BdApi.saveData("BDCompat-EnabledPlugins", plugin.plugin.getName(), false)
@@ -101,7 +103,8 @@ module.exports = class BDPluginManager {
       plugin.plugin.stop()
       plugin.__started = false
       this.__log(`Stopped plugin ${plugin.plugin.getName()}`)
-    } catch (err) {
+    } 
+    catch (err) {
       this.__error(err, `Could not stop ${plugin.plugin.getName()}`)
       if (this.settings.get("disableWhenStopFailed"))
         window.BdApi.saveData("BDCompat-EnabledPlugins", plugin.plugin.getName(), false)
@@ -148,7 +151,6 @@ module.exports = class BDPluginManager {
     if (!existsSync(pluginPath)) return this.__error(null, `Tried to load a nonexistant plugin: ${pluginName}`)
 
     try {
-      // eslint-disable-next-line global-require
       const meta = require(pluginPath)
       try {
         const plugin = new meta.type
@@ -157,20 +159,23 @@ module.exports = class BDPluginManager {
         delete window.bdplugins[plugin.getName()]
         window.bdplugins[plugin.getName()] = { plugin, __filePath: pluginPath, ...meta }
 
-        if (plugin.load && typeof plugin.load === "function")
+        if (plugin.load && typeof plugin.load === "function") {
           try {
             plugin.load()
 
             if (pluginName === "0PluginLibrary") this.__patchZLibPatcher()
-          } catch (err) {
+          } 
+          catch (err) {
             this.__error(err, `Failed to preload ${plugin.getName()}`)
           }
-
+        }
         this.__log(`Loaded ${plugin.getName()} v${plugin.getVersion()} by ${plugin.getAuthor()}`)
-      } catch (e) {
+      } 
+      catch (e) {
         this.__error(e, `Failed to load ${pluginName}:`, meta)
       }
-    } catch (e) {
+    } 
+    catch (e) {
       this.__error(`Failed to compile ${pluginName}:`, e)
     }
   }
@@ -235,18 +240,18 @@ module.exports = class BDPluginManager {
   
 
   __log (...message) {
-    console.log("%c[BDCompat:BDPluginManager]", "color: #3a71c1;", ...message)
+    console.log("%c[BDCompat:BDPluginManager]", "color: #3a71c1", ...message)
   }
 
   __warn (...message) {
-    console.warn("%c[BDCompat:BDPluginManager]", "color: #e8a400;", ...message)
+    console.warn("%c[BDCompat:BDPluginManager]", "color: #e8a400", ...message)
   }
 
   __error (error, ...message) {
-    console.error("%c[BDCompat:BDPluginManager]", "color: red;", ...message)
+    console.error("%c[BDCompat:BDPluginManager]", "color: red", ...message)
 
     if (error) {
-      console.groupCollapsed(`%cError: ${error.message}`, "color: red;")
+      console.groupCollapsed(`%cError: ${error.message}`, "color: red")
       console.error(error.stack)
       console.groupEnd()
     }

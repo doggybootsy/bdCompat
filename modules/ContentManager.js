@@ -77,7 +77,7 @@ module.exports = class ContentManager {
         dirname(filename) !== resolve(bdConfig.dataPath, "plugins"))
         return originalRequire.apply(this, arguments)
 
-      let content = readFileSync(filename, "utf8");
+      let content = readFileSync(filename, "utf8")
       if (content.charCodeAt(0) === 0xFEFF) content = content.slice(1) // Strip BOM
       const meta = _this.extractMeta(content)
       meta.filename = basename(filename)

@@ -1,11 +1,10 @@
-import { Icon, Switch, Anchor, OverflowTooltip, LazyImage } from "@vizality/components"
+import { Icon, Switch } from "@vizality/components"
 import { shell as eleShell } from "electron"
 import { React, getModule, getModuleByDisplayName } from "@vizality/webpack"
 import SettingsModal from "../PluginSettings.jsx"
 
 const { openModal } = getModule("openModal")
 const { ModalRoot, ModalSize } = getModule("ModalRoot")
-const Button = getModule("ButtonLooks")
 const Flex = getModuleByDisplayName("Flex")
 
 module.exports = class Cover extends React.Component {
@@ -14,67 +13,27 @@ module.exports = class Cover extends React.Component {
   }
 
   render () {
-    const name = (this.props.plugin.getName() || this.props.meta.name) ?? "No author"
-    const version = (this.props.plugin.getVersion() || this.props.meta.version) ?? "No version"
-    const author = (this.props.plugin.getAuthor() || this.props.meta.author) ?? "No author"
-    const description = (this.props.plugin.getDescription() || this.props.meta.description) ?? "No description"
-    const LibraryMissing = `${this.props.plugin?.load}`.includes("Library plugin is needed") || `${this.props.plugin?.load}`.includes("Library Missing")
-    const icon = (this.props.meta.vzIcon) ?? `vizality://assets/images/default-plugin-${this.props.ranNum}.png?width=0&height=0`
+    const { sections, meta, plugin, enabled, onChange } = this.props
+    const LibraryMissing = `${plugin?.load}`.includes("Library plugin is needed") || `${plugin?.load}`.includes("Library Missing")
     return (
       <div class="vz-addon-card-header-wrapper">
         <div class="vz-addon-card-content-wrapper">
           <div class="vz-addon-card-content">
-              <div className="vz-addon-card-icon">
-                <LazyImage
-                  className="vz-addon-card-icon-image-wrapper"
-                  imageClassName="vz-addon-card-icon-img"
-                  src={icon}
-                />
-              </div>
+            <sections.Badge />
             <div class="vz-addon-card-header">
               <div class="vz-addon-card-metadata">
                 <div class="vz-addon-card-name-version">
-                  <OverflowTooltip className="vz-addon-card-name" text={name}>{name}</OverflowTooltip>
-                  <span class="vz-addon-card-version">{version}</span>
+                  <sections.Name />
+                  <sections.Version />
                 </div>
-                <OverflowTooltip className="vz-addon-card-author-wrapper" text={author}>
-                    {(this.props.meta.authorLink == undefined) ? (
-                      <Anchor 
-                        type="user" 
-                        userId={this.props.meta?.authorId} 
-                        className="vz-addon-card-author">{author}</Anchor>
-                    ) : (
-                      <Anchor 
-                        style={{pointerEvents: "all"}}
-                        className="vz-addon-card-author"
-                        href={this.props.meta.authorLink}>{author}</Anchor>
-                    )}
-                  </OverflowTooltip>
+                <sections.Author />
               </div>
             </div>
-            <div class="vz-addon-card-description">{description}</div>
+            <sections.Description />
             <div class="vz-addon-card-footer-wrapper">
               <div class="vz-addon-card-footer">
                 <div class="vz-addon-card-footer-section-left">
-                  <div class="vz-addon-card-uninstall">
-                    <Button.default
-                      size={Button.ButtonSizes.ICON}
-                      color={Button.ButtonColors.RED}
-                      onClick={() => BdApi.showConfirmationModal(
-                      `Uninstall ${name}`, 
-                        [`Are you sure you wan't to uninstall ${name}`], 
-                        {
-                          danger: true, 
-                          confirmText: "Uninstall", 
-                          onConfirm: this.props.onDelete
-                        }
-                      )}
-                    >
-                      <Icon 
-                        name="Trash" 
-                        tooltip="Uninstall" />
-                    </Button.default>
-                  </div>
+                  <sections.UninstallButton />
                 </div>
                 <div class="vz-addon-card-footer-section-right">
                   <div class="vz-addon-card-settings-button">
@@ -86,49 +45,49 @@ module.exports = class Cover extends React.Component {
                           tooltip="A library is needed for this plugin to properly work"
                         />
                       )}
-                      {(typeof this.props.meta.source === "string") && (
+                      {(typeof meta.source === "string") && (
                         <Icon
                           style={{marginLeft: "7px"}}
                           name="GitHub"
                           tooltip="Source"
-                          onClick={() => eleShell.openExternal(this.props.meta.source)}
+                          onClick={() => eleShell.openExternal(meta.source)}
                         />
                       )}
-                      {(typeof this.props.meta.invite === "string") && (
+                      {(typeof meta.invite === "string") && (
                         <Icon
                           style={{marginLeft: "7px"}}
                           name="HelpCircle"
                           tooltip="Support server"
                           onClick={() => {
-                            let code = this.props.meta.invite
+                            let code = meta.invite
                             const tester = /\.gg\/(.*)$/
                             if (tester.test(code)) code = code.match(tester)[1]
                             BdApi.findModuleByProps("acceptInvite").acceptInvite(code)
                           }}
                         />
                       )}
-                      {(typeof this.props.meta.website === "string") && (
+                      {(typeof meta.website === "string") && (
                         <Icon 
                           style={{marginLeft: "7px"}}
                           name="Globe" 
                           tooltip="Website" 
-                          onClick={() => eleShell.openExternal(this.props.meta.website)} 
+                          onClick={() => eleShell.openExternal(meta.website)} 
                         />
                       )}
-                      {(typeof this.props.plugin.getSettingsPanel === "function" && this.props.enabled) && (
+                      {(typeof plugin.getSettingsPanel === "function" && enabled) && (
                         <Icon
                           style={{marginLeft: "7px"}}
                           className="vz-addon-card-settings-button-icon-wrapper"
                           iconClassName="vz-addon-card-settings-button-icon"
                           name="Gear"
                           tooltip="Settings"
-                          onClick={() => openModal((props) => (<ModalRoot size={ModalSize.MEDIUM} {...props}><SettingsModal plugin={this.props.plugin} modalProps={props}/></ModalRoot>))}
+                          onClick={() => openModal((props) => (<ModalRoot size={ModalSize.MEDIUM} {...props}><SettingsModal plugin={plugin} modalProps={props}/></ModalRoot>))}
                         />
                       )}
                     </Flex>
                   </div>
                   <div class="vz-addon-card-toggle-wrapper">
-                    <Switch className="vz-addon-card-toggle" checked={this.props.enabled} onChange={this.props.onChange}/>
+                    <Switch className="vz-addon-card-toggle" checked={enabled} onChange={onChange}/>
                   </div>
                 </div>
               </div>

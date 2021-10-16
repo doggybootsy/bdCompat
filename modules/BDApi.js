@@ -1,4 +1,4 @@
-import { getModule, getAllModules, getModuleByDisplayName, React, ReactDOM } from "@vizality/webpack"
+import { getModule, getAllModules, getModuleByDisplayName, React, ReactDOM, getModuleByPrototypes } from "@vizality/webpack"
 import { patch, unpatch } from "@vizality/patcher"
 import { join } from "path"
 import { existsSync, writeFileSync, mkdirSync, readFileSync } from "fs"
@@ -185,13 +185,13 @@ class BdApi {
     const ModalActions = BdApi.findModuleByProps("openModal")
     const Buttons = BdApi.findModuleByProps("ButtonColors")
     const {Messages} = BdApi.findModuleByProps("Messages")
-    if (!ModalActions || !ConfirmationModal || !Markdown) return this.default(title, content);
+    if (!ModalActions || !ConfirmationModal || !Markdown) return this.default(title, content)
 
-    const emptyFunction = () => {};
-    const {onConfirm = emptyFunction, onCancel = emptyFunction, confirmText = Messages.OKAY, cancelText = Messages.CANCEL, danger = false, key = undefined} = options;
+    const emptyFunction = () => {}
+    const {onConfirm = emptyFunction, onCancel = emptyFunction, confirmText = Messages.OKAY, cancelText = Messages.CANCEL, danger = false, key = undefined} = options
 
-    if (!Array.isArray(content)) content = [content];
-    content = content.map(c => typeof(c) === "string" ? React.createElement(Markdown, null, c) : c);
+    if (!Array.isArray(content)) content = [content]
+    content = content.map(c => typeof(c) === "string" ? React.createElement(Markdown, null, c) : c)
 
     return ModalActions.openModal(props => {
         return React.createElement(ConfirmationModal, Object.assign({
@@ -201,8 +201,8 @@ class BdApi {
             cancelText: cancelText,
             onConfirm: onConfirm,
             onCancel: onCancel
-        }, props), content);
-    }, {modalKey: key});
+        }, props), content)
+    }, {modalKey: key})
 }
 
   static showToast (content, options = {}) {
@@ -300,7 +300,7 @@ class BdApi {
   }
 
   static findModuleByPrototypes(...protos) {
-    return getModule(module => module.prototype && protos.every(proto => typeof module.prototype[proto] !== "undefined"), false)
+    return getModuleByPrototypes([protos])
   }
 
   static findModuleByDisplayName(displayName) {
@@ -458,18 +458,18 @@ class BdApi {
   }
 
   static __log (...message) {
-    console.log("%c[BDCompat:BdApi]", "color: #3a71c1;", ...message)
+    console.log("%c[BDCompat:BdApi]", "color: #3a71c1", ...message)
   }
 
   static __warn (...message) {
-    console.log("%c[BDCompat:BdApi]", "color: #e8a400;", ...message)
+    console.log("%c[BDCompat:BdApi]", "color: #e8a400", ...message)
   }
 
   static __error (error, ...message) {
-    console.log("%c[BDCompat:BdApi]", "color: red;", ...message)
+    console.log("%c[BDCompat:BdApi]", "color: red", ...message)
 
     if (error) {
-      console.groupCollapsed(`%cError: ${error.message}`, "color: red;")
+      console.groupCollapsed(`%cError: ${error.message}`, "color: red")
       console.error(error.stack)
       console.groupEnd()
     }
