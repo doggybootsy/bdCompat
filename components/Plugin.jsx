@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react"
+import React, { memo } from "react"
 import { contextMenu, getModule } from "@vizality/webpack"
 import { Icon, Switch, Anchor, OverflowTooltip, LazyImage } from "@vizality/components"
 import Cards from "./Card"

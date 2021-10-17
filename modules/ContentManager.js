@@ -12,15 +12,11 @@ module.exports = class ContentManager {
     Module._extensions[".js"] = this.getContentRequire()
   }
 
-  destroy() {
-    Module._extensions[".js"] = originalRequire
-  }
+  destroy() {Module._extensions[".js"] = originalRequire}
 
   get pluginsFolder() {
     const pluginDir = join(__dirname, "..", "plugins")
-
     if (!existsSync(pluginDir)) mkdirSync(pluginDir)
-
     return pluginDir
   }
 
@@ -39,14 +35,11 @@ module.exports = class ContentManager {
   parseOldMeta(content) {
     const metaLine = content.split("\n")[0]
     const rawMeta = metaLine.substring(metaLine.lastIndexOf("//META") + 6, metaLine.lastIndexOf("*//"))
-
     if (metaLine.indexOf("META") < 0) throw new Error("META was not found.")
     if (!window.BdApi.testJSON(rawMeta)) throw new Error("META could not be parsed")
-
     const parsed = JSON.parse(rawMeta)
     if (!parsed.name) throw new Error("META missing name data")
     parsed.format = "json"
-
     return parsed
   }
 
@@ -61,9 +54,9 @@ module.exports = class ContentManager {
         const l = line.indexOf(" ")
         field = line.substr(1, l - 1)
         accum = line.substr(l + 1)
-      } else {
+      } 
+      else
         accum += " " + line.replace("\\n", "\n").replace(/^\\@/, "@")
-      }
     }
     out[field] = accum.trim()
     delete out[""]
@@ -73,10 +66,8 @@ module.exports = class ContentManager {
 
   getContentRequire() {
     return function (module, filename) {
-      if (!filename.endsWith(".plugin.js") ||
-        dirname(filename) !== resolve(bdConfig.dataPath, "plugins"))
+      if (!filename.endsWith(".plugin.js") || dirname(filename) !== resolve(bdConfig.dataPath, "plugins"))
         return originalRequire.apply(this, arguments)
-
       let content = readFileSync(filename, "utf8")
       if (content.charCodeAt(0) === 0xFEFF) content = content.slice(1) // Strip BOM
       const meta = _this.extractMeta(content)
