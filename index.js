@@ -16,6 +16,11 @@ module.exports = class BDCompat extends Plugin {
   }
 
   defineGlobals () {
+    let webReq
+    window.webpackChunkdiscord_app.push([["bdCompat"], {}, r => webReq = r])
+    window.webpackJsonp = []
+    window.webpackJsonp.push = ([, mod, [[id]]]) => mod[id]({}, {}, webReq)
+
     window.bdConfig = { dataPath: __dirname }
     window.settingsCookie = {}
 
@@ -54,7 +59,8 @@ module.exports = class BDCompat extends Plugin {
       "BdApi", 
       "Utils", 
       "ContentManager", 
-      "pluginModule"
+      "pluginModule", 
+      "webpackJsonp"
     ].forEach(g => delete window[g])
 
     delete env.injDir

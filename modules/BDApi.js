@@ -135,7 +135,7 @@ class BdApi {
     return BdApi.showConfirmationModal(title, children, { cancelText: null })
   }
   static async showConfirmationModal(title, content, options = {}) {
-    if (!ModalActions || !ConfirmationModal || !Markdown) return this.default(title, content)
+    if (!ConfirmationModal || !Markdown) return this.default(title, content)
     const emptyFunction = () => {}
     const {onConfirm = emptyFunction, onCancel = emptyFunction, confirmText = Messages.OKAY, cancelText = Messages.CANCEL, danger = false, key = undefined} = options
     if (!Array.isArray(content)) content = [content]
