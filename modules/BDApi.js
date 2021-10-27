@@ -3,7 +3,7 @@ import { patch, unpatch } from "@vizality/patcher"
 import { join } from "path"
 import { existsSync, writeFileSync, mkdirSync, readFileSync } from "fs"
 import { randomBytes } from "crypto"
-
+import {  Messages, Button, openModal, ConfirmationModal, Markdown } from "../constants"
 import { Patcher, DiscordModules } from "."
 
 const { getOwnerInstance, getReactInstance } = require("@vizality/util").react
@@ -17,13 +17,9 @@ const PluginData = {}
 class BdApi {
   // React
   static get React () {return React}
-
   static get ReactDOM () {return ReactDOM}
-
   // Patcher
   static get Patcher() {return Patcher}
-
-
   // General
   static getCore () {
     return null
@@ -31,7 +27,6 @@ class BdApi {
   static escapeID (id) {
     return id.replace(/^[^a-z]+|[^\w-]+/giu, "")
   }
-
   static suppressErrors (method, message = "") {
     return (...params) => {
       try {
@@ -41,7 +36,6 @@ class BdApi {
       }
     }
   }
-
   static testJSON (data) {
     try {
       JSON.parse(data)
@@ -50,33 +44,24 @@ class BdApi {
       return false
     }
   }
-
-
   // Style tag
   static get __styleParent () {
     return BdApi.__elemParent("style")
   }
-
   static injectCSS (id, css) {
     const style = document.createElement("style")
-
     style.id = `bd-style-${BdApi.escapeID(id)}`
     style.innerHTML = css
-
     BdApi.__styleParent.append(style)
   }
-
   static clearCSS (id) {
     const elem = document.getElementById(`bd-style-${BdApi.escapeID(id)}`)
     if (elem) elem.remove()
   }
-
-
   // Script tag
   static get __scriptParent () {
     return BdApi.__elemParent("script")
   }
-
   static linkJS (id, url) {
     return new Promise((resolve) => {
       const script = document.createElement("script")
@@ -87,25 +72,19 @@ class BdApi {
       BdApi.__scriptParent.append(script)
     })
   }
-
   static unlinkJS (id) {
     const elem = document.getElementById(`bd-script-${BdApi.escapeID(id)}`)
     if (elem) elem.remove()
   }
-
-
   // Plugin data
   static get __pluginData () {
     return PluginData
   }
-
   static __getPluginConfigPath (pluginName) {
     return join(__dirname, "..", "config", pluginName + ".config.json")
   }
-
   static __getPluginConfig (pluginName) {
     const configPath = BdApi.__getPluginConfigPath(pluginName)
-
     if (typeof BdApi.__pluginData[pluginName] === "undefined")
       if (!existsSync(configPath)) {
         BdApi.__pluginData[pluginName] = {}
@@ -117,75 +96,54 @@ class BdApi {
           BdApi.__warn(`${pluginName} has corrupted or empty config file, loaded as {}`)
         }
       }
-
-
     return BdApi.__pluginData[pluginName]
   }
-
   static __savePluginConfig (pluginName) {
     const configPath = BdApi.__getPluginConfigPath(pluginName)
     const configFolder = join(__dirname, "..", "config/")
-
     if (!existsSync(configFolder)) mkdirSync(configFolder)
     writeFileSync(configPath, JSON.stringify(BdApi.__pluginData[pluginName], null, 2))
   }
-
-
   static loadData (pluginName, key) {
     const config = BdApi.__getPluginConfig(pluginName)
-
     return config[key]
   }
-
   static get getData () {
     return BdApi.loadData
   }
-
-
   static saveData (pluginName, key, value) {
     if (typeof value === "undefined") return
     const config = BdApi.__getPluginConfig(pluginName)
     config[key] = value
     BdApi.__savePluginConfig(pluginName)
   }
-
   static get setData () {
     return BdApi.saveData
   }
-
   static deleteData (pluginName, key) {
     const config = BdApi.__getPluginConfig(pluginName)
     if (typeof config[key] === "undefined") return
     delete config[key]
     BdApi.__savePluginConfig(pluginName)
   }
-
-
   // Plugin communication
   static getPlugin (name) {
     if (window.bdplugins[name]) return window.bdplugins[name].plugin
   }
-
-
   // Alerts and toasts
   static async alert(title, children) {
     return BdApi.showConfirmationModal(title, children, { cancelText: null })
   }
   static async showConfirmationModal(title, content, options = {}) {
-    const Markdown = BdApi.findModule(m => m.displayName && m.displayName === "Markdown" && m.rules)
-    const ConfirmationModal = BdApi.findModuleByDisplayName("ConfirmModal")
-    const ModalActions = BdApi.findModuleByProps("openModal", "openModalLazy")
-    const Buttons = BdApi.findModuleByProps("ButtonColors")
-    const {Messages} = BdApi.findModule(m => m.Messages && m.getLocale && m.Messages.CLOSE)
     if (!ModalActions || !ConfirmationModal || !Markdown) return this.default(title, content)
     const emptyFunction = () => {}
     const {onConfirm = emptyFunction, onCancel = emptyFunction, confirmText = Messages.OKAY, cancelText = Messages.CANCEL, danger = false, key = undefined} = options
     if (!Array.isArray(content)) content = [content]
     content = content.map(c => typeof(c) === "string" ? React.createElement(Markdown, null, c) : c)
-    return ModalActions.openModal(props => {
+    return openModal(props => {
       return React.createElement(ConfirmationModal, Object.assign({
         header: title,
-        confirmButtonColor: danger ? Buttons.ButtonColors.RED : Buttons.ButtonColors.BRAND,
+        confirmButtonColor: danger ? Button.ButtonColors.RED : Button.ButtonColors.BRAND,
         confirmText: confirmText,
         cancelText: cancelText,
         onConfirm: onConfirm,

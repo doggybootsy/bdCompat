@@ -3,6 +3,8 @@ import { Icon, StickyElement, Popout } from "@vizality/components"
 import { shell as eleShell } from "electron"
 import { useToggle } from "@vizality/hooks"
 
+import { Flex, Search } from "../constants"
+
 import DisplayPopout from "./Popout"
 import Plugin from "./Plugin.jsx"
 
@@ -46,8 +48,6 @@ module.exports = class PluginList extends React.Component {
   render () {
     const plugins = this.__getPlugins()
     let num = 0
-    const Search = BdApi.findModuleByDisplayName("Searchbar")
-    const Flex = BdApi.findModuleByDisplayName("Flex")
     const display = vizality.api.settings._fluxProps("addon-manager").getSetting("listDisplay", "card")
     return (
       <div className="vz-addons-list" vz-display={display}>

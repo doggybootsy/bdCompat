@@ -1,10 +1,9 @@
 import React, { memo } from "react"
-import { contextMenu, getModule } from "@vizality/webpack"
+import { contextMenu } from "@vizality/webpack"
 import { Icon, Switch, Anchor, OverflowTooltip, LazyImage } from "@vizality/components"
 import Cards from "./Card"
 import ContextMenu from "./ContextMenu"
-
-const Button = getModule("ButtonLooks")
+import { Button } from "../constants"
 
 module.exports = class Plugin extends React.Component {
   constructor(props) {

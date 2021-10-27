@@ -1,16 +1,16 @@
 import { ContextMenu, Icon } from "@vizality/components"
 import React, { memo } from "react"
 
-const Items = ["compact","cover","card","list"]
+const Layouts = ["compact","cover","card","list"]
 
 export default memo(({ display, setDisplay, onClose }) => {
   return (
     <ContextMenu.Menu navId="vz-addons-list-display-menu" onClose={onClose}>
       <ContextMenu.Group label="Layout">
-        {Items.map(layout => (
+        {Layouts.map(layout => (
           <ContextMenu.RadioItem 
             id={layout}
-            checked={display == layout}
+            checked={display === layout}
             label={() => (
               <div className="vz-addon-context-menu-label-inner">
                 <Icon 

@@ -1,10 +1,10 @@
 import { shell as eleShell } from "electron"
 import { Icon, Switch } from "@vizality/components"
-import { getModule, React } from "@vizality/webpack"
+import { React } from "@vizality/webpack"
 import SettingsModal from "../PluginSettings.jsx"
+import { openModal, ModalRoot as ModalRootMod } from "../../constants"
 
-const { openModal } = getModule("openModal", "openModalLazy")
-const { ModalRoot, ModalSize } = getModule("ModalRoot")
+const { ModalRoot, ModalSize } = ModalRootMod
 
 module.exports = class Card extends React.Component {
   constructor (props) {

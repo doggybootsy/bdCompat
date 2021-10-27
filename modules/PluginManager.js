@@ -106,8 +106,6 @@ module.exports = class BDPluginManager {
     } 
     catch (err) {
       this.__error(err, `Could not stop ${plugin.plugin.getName()}`)
-      if (this.settings.get("disableWhenStopFailed"))
-        window.BdApi.saveData("BDCompat-EnabledPlugins", plugin.plugin.getName(), false)
     }
   }
   reloadPlugin (pluginName) {

@@ -1,11 +1,10 @@
 import { Icon, Switch } from "@vizality/components"
 import { shell as eleShell } from "electron"
-import { React, getModule, getModuleByDisplayName } from "@vizality/webpack"
+import { React } from "@vizality/webpack"
 import SettingsModal from "../PluginSettings.jsx"
+import { openModal, ModalRoot as ModalRootMod, Flex } from "../../constants"
 
-const { openModal } = getModule("openModal", "openModalLazy")
-const { ModalRoot, ModalSize } = getModule("ModalRoot")
-const Flex = getModuleByDisplayName("Flex")
+const { ModalRoot, ModalSize } = ModalRootMod
 
 module.exports = class Cover extends React.Component {
   constructor (props) {

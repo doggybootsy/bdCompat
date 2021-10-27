@@ -6,20 +6,20 @@
  */
 const memoizeObject = (object) => {
   const proxy = new Proxy(object, {
-      get: function(obj, mod) {
-          if (!obj.hasOwnProperty(mod)) return undefined
-          if (Object.getOwnPropertyDescriptor(obj, mod).get) {
-              const value = obj[mod]
-              delete obj[mod]
-              obj[mod] = value
-          }
-          return obj[mod]
-      },
-      set: function(obj, mod, value) {
-          if (obj.hasOwnProperty(mod)) return log.error("MemoizedObject", "Trying to overwrite existing property")
+    get: function(obj, mod) {
+      if (!obj.hasOwnProperty(mod)) return undefined
+        if (Object.getOwnPropertyDescriptor(obj, mod).get) {
+          const value = obj[mod]
+          delete obj[mod]
           obj[mod] = value
-          return obj[mod]
-      }
+        }
+        return obj[mod]
+    },
+    set: function(obj, mod, value) {
+      if (obj.hasOwnProperty(mod)) return log.error("MemoizedObject", "Trying to overwrite existing property")
+      obj[mod] = value
+      return obj[mod]
+    }
   })
 
   Object.defineProperty(proxy, "hasOwnProperty", {value: function(prop) {

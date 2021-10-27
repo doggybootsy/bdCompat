@@ -1,12 +1,9 @@
 import { React } from "@vizality/webpack"
 import { resolve } from "path"
 
-const { ModalHeader, ModalContent, ModalCloseButton, ModalFooter } = BdApi.findModuleByProps("ModalRoot")
-const { Messages } = BdApi.findModule(m => m.Messages && m.getLocale && m.Messages.CLOSE)
-const Button = BdApi.findModuleByProps("ButtonLooks")
-const Header = BdApi.findModule(m => m.displayName && m.displayName === "Header" && m.Sizes)
-const Flex = BdApi.findModuleByDisplayName("Flex")
-const Text = BdApi.findModuleByDisplayName("text")
+import { ModalRoot, Messages, Button, Header, Flex, Text } from "../constants"
+
+const { ModalHeader, ModalContent, ModalCloseButton, ModalFooter } = ModalRoot
 
 module.exports = class PluginSettings extends React.Component {
   renderPluginSettings() {
@@ -15,9 +12,7 @@ module.exports = class PluginSettings extends React.Component {
       panel = this.props.plugin.getSettingsPanel()
     } catch (e) {
       console.error(e)
-
       const error = (e.stack || e.toString()).split("\n").filter(l => !l.includes("discordapp.com/assets/") && !l.includes("discord.com/assets/")).join("\n").split(resolve(__dirname, "..", "..")).join("")
-
       return (
         <div className="vizality-text vizality-settings-error">
           <div>An error occurred while rendering settings panel.</div>
@@ -27,7 +22,6 @@ module.exports = class PluginSettings extends React.Component {
     }
     if (panel instanceof Node || typeof panel === "string")
       return <div ref={el => el ? panel instanceof Node ? el.append(panel) : el.innerHTML = panel : void 0}></div>
-
     return typeof panel === "function" ? React.createElement(panel) : panel
   }
 

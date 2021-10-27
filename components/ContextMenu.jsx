@@ -1,11 +1,9 @@
 import { ContextMenu as Contextmenu } from "@vizality/components"
-import { contextMenu, getModule } from "@vizality/webpack"
+import { contextMenu } from "@vizality/webpack"
 import SettingsModal from "./PluginSettings.jsx"
-
+import { openModal, ModalRoot as ModalRootMod } from "../constants"
 import React from "react"
-
-const { openModal } = getModule("openModal")
-const { ModalRoot, ModalSize } = getModule("ModalRoot")
+const { ModalRoot,  ModalSize } = ModalRootMod
 
 const { closeContextMenu } = contextMenu
 

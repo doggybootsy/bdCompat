@@ -1,7 +1,5 @@
 import { React } from "@vizality/webpack"
-import { SwitchItem } from "@vizality/components/settings"
-
-const PluginList = require('./PluginList.jsx')
+import PluginList from "./PluginList.jsx"
 
 module.exports = class Settings extends React.Component {
   constructor (props) {
@@ -10,13 +8,7 @@ module.exports = class Settings extends React.Component {
 
   render () {
     return (
-      <div>
-        <SwitchItem value={this.props.getSetting('disableWhenStopFailed')}
-        onChange={() => this.props.toggleSetting('disableWhenStopFailed')}>
-          Disable plugin when failed to stop
-        </SwitchItem>
-        <PluginList pluginManager={window.pluginModule} />
-      </div>
+      <PluginList pluginManager={window.pluginModule} />
     )
   }
 }
