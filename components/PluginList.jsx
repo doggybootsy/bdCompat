@@ -60,7 +60,7 @@ module.exports = class PluginList extends React.Component {
                   size={Search.Sizes.SMALL}
                   placeholder="Search" 
                   query={this.state.search}
-                  onChange={(val) => this.setState({search: val})}
+                  onQueryChange={(val) => this.setState({search: val})}
                   onClear={() => this.setState({search: ""})}
                 />
               </div>

@@ -2,9 +2,9 @@ import { React } from "@vizality/webpack"
 import { resolve } from "path"
 
 const { ModalHeader, ModalContent, ModalCloseButton, ModalFooter } = BdApi.findModuleByProps("ModalRoot")
-const { Messages } = BdApi.findModuleByProps("Messages")
+const { Messages } = BdApi.findModule(m => m.Messages && m.getLocale && m.Messages.CLOSE)
 const Button = BdApi.findModuleByProps("ButtonLooks")
-const Header = BdApi.findModuleByDisplayName("Header")
+const Header = BdApi.findModule(m => m.displayName && m.displayName === "Header" && m.Sizes)
 const Flex = BdApi.findModuleByDisplayName("Flex")
 const Text = BdApi.findModuleByDisplayName("text")
 
@@ -16,10 +16,7 @@ module.exports = class PluginSettings extends React.Component {
     } catch (e) {
       console.error(e)
 
-      const error = (e.stack || e.toString()).split("\n")
-        .filter(l => !l.includes("discordapp.com/assets/") && !l.includes("discord.com/assets/"))
-        .join("\n")
-        .split(resolve(__dirname, "..", "..")).join("")
+      const error = (e.stack || e.toString()).split("\n").filter(l => !l.includes("discordapp.com/assets/") && !l.includes("discord.com/assets/")).join("\n").split(resolve(__dirname, "..", "..")).join("")
 
       return (
         <div className="vizality-text vizality-settings-error">

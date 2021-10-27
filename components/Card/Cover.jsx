@@ -3,7 +3,7 @@ import { shell as eleShell } from "electron"
 import { React, getModule, getModuleByDisplayName } from "@vizality/webpack"
 import SettingsModal from "../PluginSettings.jsx"
 
-const { openModal } = getModule("openModal")
+const { openModal } = getModule("openModal", "openModalLazy")
 const { ModalRoot, ModalSize } = getModule("ModalRoot")
 const Flex = getModuleByDisplayName("Flex")
 

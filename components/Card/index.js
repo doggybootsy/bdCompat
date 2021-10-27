@@ -1,7 +1,5 @@
-require("fs")
-  .readdirSync(__dirname)
-  .filter(file => file != "index.js")
-  .forEach(filename => {
-    const moduleName = filename.split(".")[0]
-    exports[moduleName] = require(`${__dirname}/${filename}`)
-  })
+import { readdirSync } from "fs"
+import { join } from "path"
+
+for (const filename of readdirSync(__dirname).filter(file => file != "index.js"))
+  exports[filename.split(".")[0]] = require(join(__dirname, filename))

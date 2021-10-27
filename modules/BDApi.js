@@ -80,12 +80,10 @@ class BdApi {
   static linkJS (id, url) {
     return new Promise((resolve) => {
       const script = document.createElement("script")
-
       script.id = `bd-script-${BdApi.escapeID(id)}`
       script.src = url
       script.type = "text/javascript"
       script.onload = resolve
-
       BdApi.__scriptParent.append(script)
     })
   }
@@ -146,11 +144,8 @@ class BdApi {
 
   static saveData (pluginName, key, value) {
     if (typeof value === "undefined") return
-
     const config = BdApi.__getPluginConfig(pluginName)
-
     config[key] = value
-
     BdApi.__savePluginConfig(pluginName)
   }
 
@@ -160,10 +155,8 @@ class BdApi {
 
   static deleteData (pluginName, key) {
     const config = BdApi.__getPluginConfig(pluginName)
-
     if (typeof config[key] === "undefined") return
     delete config[key]
-
     BdApi.__savePluginConfig(pluginName)
   }
 
@@ -178,59 +171,47 @@ class BdApi {
   static async alert(title, children) {
     return BdApi.showConfirmationModal(title, children, { cancelText: null })
   }
-
   static async showConfirmationModal(title, content, options = {}) {
-    const Markdown = BdApi.findModuleByDisplayName("Markdown")
+    const Markdown = BdApi.findModule(m => m.displayName && m.displayName === "Markdown" && m.rules)
     const ConfirmationModal = BdApi.findModuleByDisplayName("ConfirmModal")
-    const ModalActions = BdApi.findModuleByProps("openModal")
+    const ModalActions = BdApi.findModuleByProps("openModal", "openModalLazy")
     const Buttons = BdApi.findModuleByProps("ButtonColors")
-    const {Messages} = BdApi.findModuleByProps("Messages")
+    const {Messages} = BdApi.findModule(m => m.Messages && m.getLocale && m.Messages.CLOSE)
     if (!ModalActions || !ConfirmationModal || !Markdown) return this.default(title, content)
-
     const emptyFunction = () => {}
     const {onConfirm = emptyFunction, onCancel = emptyFunction, confirmText = Messages.OKAY, cancelText = Messages.CANCEL, danger = false, key = undefined} = options
-
     if (!Array.isArray(content)) content = [content]
     content = content.map(c => typeof(c) === "string" ? React.createElement(Markdown, null, c) : c)
-
     return ModalActions.openModal(props => {
-        return React.createElement(ConfirmationModal, Object.assign({
-            header: title,
-            confirmButtonColor: danger ? Buttons.ButtonColors.RED : Buttons.ButtonColors.BRAND,
-            confirmText: confirmText,
-            cancelText: cancelText,
-            onConfirm: onConfirm,
-            onCancel: onCancel
-        }, props), content)
+      return React.createElement(ConfirmationModal, Object.assign({
+        header: title,
+        confirmButtonColor: danger ? Buttons.ButtonColors.RED : Buttons.ButtonColors.BRAND,
+        confirmText: confirmText,
+        cancelText: cancelText,
+        onConfirm: onConfirm,
+        onCancel: onCancel
+      }, props), content)
     }, {modalKey: key})
-}
-
+  }
   static showToast (content, options = {}) {
     const { type = "", icon = true, timeout = 3000 } = options
-
     const toastElem = document.createElement("div")
     toastElem.classList.add("bd-toast")
     toastElem.innerText = content
-
     if (type) toastElem.classList.add(`toast-${type}`)
     if (type && icon) toastElem.classList.add("icon")
-
     const toastWrapper = BdApi.__createToastWrapper()
     toastWrapper.appendChild(toastElem)
-
     setTimeout(() => {
       toastElem.classList.add("closing")
-
       setTimeout(() => {
         toastElem.remove()
         if (!document.querySelectorAll(".bd-toasts .bd-toast").length) toastWrapper.remove()
       }, 300)
     }, timeout)
   }
-
   static __createToastWrapper () {
     const toastWrapperElem = document.querySelector(".bd-toasts")
-
     if (!toastWrapperElem) {
       const DiscordElements = {
         settings: ".contentColumn-2hrIYH, .customColumn-Rb6toI",
@@ -241,9 +222,7 @@ class BdApi {
         gameLibrary: ".gameLibrary-TTDw4Y",
         activityFeed: ".activityFeed-28jde9",
       }
-
       const boundingElement = document.querySelector(Object.keys(DiscordElements).map((component) => DiscordElements[component]).join(", "))
-
       const toastWrapper = document.createElement("div")
       toastWrapper.classList.add("bd-toasts")
       toastWrapper.style.setProperty("width", boundingElement ? `${boundingElement.offsetWidth}px` : "100%")
@@ -252,34 +231,25 @@ class BdApi {
         "bottom",
         (document.querySelector(DiscordElements.chat) ? document.querySelector(DiscordElements.chat).offsetHeight + 20 : 80) + "px"
       )
-
       document.querySelector("#app-mount > div[class^=\"app-\"]").appendChild(toastWrapper)
-
       return toastWrapper
     }
-
     return toastWrapperElem
   }
-
-
   // Discord's internals manipulation and such
   static onRemoved (node, callback) {
     const observer = new MutationObserver((mutations) => {
       for (const mut in mutations) {
         const mutation = mutations[mut]
         const nodes = Array.from(mutation.removedNodes)
-
         const directMatch = nodes.indexOf(node) > -1
         const parentMatch = nodes.some((parent) => parent.contains(node))
-
         if (directMatch || parentMatch) {
           observer.disconnect()
-
           return callback()
         }
       }
     })
-
     observer.observe(document.body, { subtree: true, childList: true })
   }
 
@@ -308,25 +278,17 @@ class BdApi {
   }
 
   static monkeyPatch (what, methodName, options = {}) {
-    const displayName = options.displayName || what.displayName || what[methodName].displayName
-      || what.name || what.constructor.displayName || what.constructor.name || "MissingName"
-
-    // if (options.instead) return BdApi.__warn("Powercord API currently does not support replacing the entire method!")
+    const displayName = options.displayName || what.displayName || what[methodName].displayName || what.name || what.constructor.displayName || what.constructor.name || "MissingName"
 
     if (!what[methodName])
       if (options.force) {
-        // eslint-disable-next-line no-empty-function
         what[methodName] = function forcedFunction () {}
       } else {
         return BdApi.__error(null, `${methodName} doesn't exist in ${displayName}!`)
       }
-
-
     if (!options.silent)
       BdApi.__log(`Patching ${displayName}'s ${methodName} method`)
-
     const origMethod = what[methodName]
-
     if (options.instead) {
       const cancel = () => {
         if (!options.silent) BdApi.__log(`Unpatching instead of ${displayName} ${methodName}`)
@@ -347,15 +309,11 @@ class BdApi {
       if (displayName != "MissingName") what[methodName].displayName = displayName
       return cancel
     }
-  
-
     const patches = []
     if (options.before) patches.push(BdApi.__injectBefore({ what, methodName, options, displayName }, origMethod))
     if (options.after) patches.push(BdApi.__injectAfter({ what, methodName, options, displayName }, origMethod))
     if (displayName != "MissingName") what[methodName].displayName = displayName
-
     const finalCancelPatch = () => patches.forEach((patch) => patch())
-
     return finalCancelPatch
   }
 

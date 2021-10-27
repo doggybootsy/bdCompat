@@ -3,7 +3,7 @@ import { Icon, Switch } from "@vizality/components"
 import { getModule, React } from "@vizality/webpack"
 import SettingsModal from "../PluginSettings.jsx"
 
-const { openModal } = getModule("openModal")
+const { openModal } = getModule("openModal", "openModalLazy")
 const { ModalRoot, ModalSize } = getModule("ModalRoot")
 
 module.exports = class Card extends React.Component {
