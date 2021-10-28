@@ -1,5 +1,5 @@
 import { Icon, Switch } from "@vizality/components"
-import { React } from "@vizality/webpack"
+import React from "react"
 import SettingsModal from "../PluginSettings.jsx"
 import { openModal, ModalRoot as ModalRootMod } from "../../constants"
 

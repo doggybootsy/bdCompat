@@ -2,11 +2,14 @@ import React, { memo, useState } from "react"
 import { Icon, StickyElement, Popout } from "@vizality/components"
 import { shell as eleShell } from "electron"
 import { useToggle } from "@vizality/hooks"
-
-import { Flex, Search } from "../constants"
-
+import BdSettings from "./BdSettings"
 import DisplayPopout from "./Popout"
 import Plugin from "./Plugin.jsx"
+import { Search, ModalRoot as ModalRootMod, Messages, Button, Header, Flex, Text, openModal } from "../constants"
+
+const { ModalHeader, ModalContent, ModalFooter, ModalRoot, ModalSize } = ModalRootMod
+
+const manifest = require("../manifest.json")
 
 const Displaypopout = memo(({}) => {
   const [ showDisplayPopout, toggleDisplayPopout ] = useToggle(false)
@@ -21,9 +24,7 @@ const Displaypopout = memo(({}) => {
   return (
     <Popout renderPopout={props => <DisplayPopout {...props} display={display} setDisplay={setDisplay} />} position="left" animation="2" shouldShow={showDisplayPopout} onRequestClose={toggleDisplayPopout}>
       {props => (
-        <div 
-          style={{ marginRight: "4px" }}
-        >
+        <div className="vz-addons-list-filter-button vz-addons-list-search-options-button">
           <Icon
             tooltip="Display"
             name={`Layout${display[0].toUpperCase()}${display.substring(1)}`}
@@ -49,12 +50,13 @@ module.exports = class PluginList extends React.Component {
     const plugins = this.__getPlugins()
     let num = 0
     const display = vizality.api.settings._fluxProps("addon-manager").getSetting("listDisplay", "card")
+    const isInModal = this.props.pluginManager.settings.get("SettingsModal", false)
     return (
       <div className="vz-addons-list" vz-display={display}>
         <div className="vz-sticky-element-wrapper vz-addons-list-sticky-bar-wrapper" style={{top: "40px"}}>
           <StickyElement className="vz-sticky-element vz-addons-list-sticky-bar">
             <Flex>
-              <Flex></Flex>
+              <Flex />
               <div style={{ width: "166px", margin: "auto" }}>
                 <Search 
                   size={Search.Sizes.SMALL}
@@ -66,12 +68,42 @@ module.exports = class PluginList extends React.Component {
               </div>
               <div style={{height: "1.8rem", width: "fit-content", padding: "0 0 0 .8rem", display: "flex"}}>
                 <Displaypopout />
-                <Icon 
-                  name="Folder" 
-                  onClick={() => eleShell.openPath(window.ContentManager.pluginsFolder)}
-                  tooltip="Open Plugins Folder"
-                  size="25px"
-                />
+                <div className="vz-addons-list-filter-button vz-addons-list-search-options-button BD-icon-list">
+                  <Icon 
+                    name="Folder" 
+                    onClick={() => eleShell.openPath(window.ContentManager.pluginsFolder)}
+                    tooltip="Open Plugins Folder"
+                    size="25px"
+                  />
+                </div>
+                <div className="vz-addons-list-more-button vz-addons-list-search-options-button">
+                  <Icon 
+                    name="Gear" 
+                    onClick={() => {
+                      if(isInModal) openModal((props) => (
+                        <ModalRoot size={ModalSize.MEDIUM} {...props}>
+                          <ModalHeader separator={false}>
+                            <Flex>
+                              <Flex.Child>
+                                <Header tag="h2">{manifest.name}</Header>
+                                <Text>{manifest.version}</Text>
+                              </Flex.Child>
+                            </Flex>
+                          </ModalHeader>
+                          <ModalContent>
+                            <BdSettings  {...this.props}/>
+                          </ModalContent>
+                          <ModalFooter>
+                            <Button.default onClick={props.onClose}>{Messages.DONE}</Button.default>
+                          </ModalFooter>
+                        </ModalRoot>
+                      ))
+                      else this.props.changePage()
+                    }}
+                    tooltip={isInModal ? "Open Settings Modal" : "Open Settings Page"}
+                    size="25px"
+                  />
+                </div>
               </div>
             </Flex>
           </StickyElement>

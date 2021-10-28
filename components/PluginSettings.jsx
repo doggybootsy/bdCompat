@@ -1,4 +1,4 @@
-import { React } from "@vizality/webpack"
+import React from "react"
 import { resolve } from "path"
 
 import { ModalRoot, Messages, Button, Header, Flex, Text } from "../constants"
@@ -45,7 +45,7 @@ module.exports = class PluginSettings extends React.Component {
             </div>
           </ModalContent>
           <ModalFooter>
-            <Button.default onClick={() => this.props.modalProps.onClose()}>{Messages.DONE}</Button.default>
+            <Button.default onClick={this.props.modalProps.onClose}>{Messages.DONE}</Button.default>
           </ModalFooter>
         </>
       )
