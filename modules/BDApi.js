@@ -32,8 +32,8 @@ const BdApi = {
   findModuleByDisplayName: function(name) {return getModuleByDisplayName(name)},
   findModuleByPrototypes: function(...protos) {return getModuleByPrototypes([...protos])},
   findModuleByProps: function(...props) { return getModule(...props) },
-  findModule: function(filter) {return getModule(filter)},
-  findAllModules: function(filter) {return getModules(filter)},
+  findModule: function(filter) { return getModule(filter) },
+  findAllModules: function(filter) { return getModules(filter) },
   // Patcher
   Patcher: {
 
