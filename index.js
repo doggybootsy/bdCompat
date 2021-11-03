@@ -9,6 +9,7 @@ export default class BDCompat extends Plugin {
       try { return require(path) } catch (error) { return undefined }
     }
     Dom.initialize()
+    this.injectStyles("./styles/index.scss")
   }
 
   stop () {

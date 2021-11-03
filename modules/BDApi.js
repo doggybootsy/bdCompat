@@ -1,6 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import Dom from "./Dom"
+import { Logger, Dom, Toasts } from "./"
 import { getModuleByDisplayName, getModuleByPrototypes, getModule, getModules } from "@vizality/webpack"
 
 const BdApi = {
@@ -31,7 +31,7 @@ const BdApi = {
   // Modules
   findModuleByDisplayName: function(name) {return getModuleByDisplayName(name)},
   findModuleByPrototypes: function(...protos) {return getModuleByPrototypes([...protos])},
-  findModuleByProps: function(...props) {return getModule(...props)},
+  findModuleByProps: function(...props) { return getModule(...props) },
   findModule: function(filter) {return getModule(filter)},
   findAllModules: function(filter) {return getModules(filter)},
   // Patcher
@@ -64,7 +64,22 @@ const BdApi = {
   },
   alert: async function(title, children) { BdApi.showConfirmationModal(title, children, { cancelText: null }) },
   // Misc
+  showToast: function(content, options = {}) {
+    Toasts.show(content, options)
+  },
   escapeID: function(id) { return id.replace(/^[^a-z]+|[^\w-]+/gi, "-") },
-  WindowConfigFile: ""
+  WindowConfigFile: "",
+  emotes: new Proxy({ TwitchGlobal: {}, TwitchSubscriber: {}, BTTV: {}, FrankerFaceZ: {} }, {
+    get(obj, category) {
+      if (category === "blocklist") return []
+      const group = { TwitchGlobal: {}, TwitchSubscriber: {}, BTTV: {}, FrankerFaceZ: {} }[category]
+      if (!group) return undefined
+      return new Proxy(group, {
+        get(cat, emote) { return group[emote] },
+        set() { Logger.warn("BdApi.emotes", "Addon policy for plugins #5 https://github.com/BetterDiscord/BetterDiscord/wiki/Addon-Policies#plugins") }
+      })
+    },
+    set() { Logger.warn("BdApi.emotes", "Addon policy for plugins #5 https://github.com/BetterDiscord/BetterDiscord/wiki/Addon-Policies#plugins") }
+  })
 }
 export default BdApi
