@@ -15,6 +15,7 @@ export default memo(({ getSetting, updateSetting, toggleSetting }) => {
   }
   return (
     <>
+      <SwitchItem 
         description={<Flex>Show Betterdiscords toast <div style={{marginLeft: "10px"}}/>
           <div class={`${keybindShortcut}`}><Tooltip text={showToast ? "Will show toast's" : "Wont show toast's"}>
               {TtProps => <span {...TtProps} onClick={showAllToastTypes}>DEMO</span>}
