@@ -7,7 +7,7 @@ import { Logger } from "./"
 export default class Toasts {
   static get ChannelsClass() { return getModule("sidebar", "hasNotice").sidebar.split(" ")[0] }
   static get MembersWrapClass() { return getModule("membersWrap").membersWrap.split(" ")[0] }
-  static get shouldShowToasts() { return true }
+  static get shouldShowToasts() { return BdApi.isSettingEnabled("settings", "general", "showToasts") }
   static show(content, options = {}) {
     try {
       const {type = "", icon = true, timeout = 3000, forceShow = false} = options
@@ -29,7 +29,6 @@ export default class Toasts {
     }
     catch (err) { Logger.stacktrace("Toasts", "Unable to show toast", err) }
   }
-
   static ensureContainer() {
     if (document.querySelector(".bd-toasts")) return
     const container = document.querySelector(`.${this.ChannelsClass} + div`)

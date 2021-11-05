@@ -12,6 +12,9 @@ export default class Dom {
     this["bd-body"] = this.createElement("<bd-body></bd-body>")
     document.body.append(this["bd-body"])
   }
+  static uninitialize() {
+    [this["bd-head"], this["bd-body"]].forEach(e => e.remove())
+  }
   // Dom stuff
   static createElement(html) {
     const template = document.createElement("template")
