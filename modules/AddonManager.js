@@ -37,7 +37,7 @@ export default class AddonManager {
                 return BdApi.alert("BdCompat:BetterDiscord", `Failed to parse ${file}`)
               }
               else {
-                console.log(meta);
+                
               }
             }
           })
@@ -45,7 +45,6 @@ export default class AddonManager {
       }
     })
   }
-
   constructor() {
     this.timeCache = {}
     this.addonList = []
@@ -53,7 +52,6 @@ export default class AddonManager {
     this.windows = new Set()
     this.loadAllAddons()
   }
-
   extractMeta(fileContent) {
     const firstLine = fileContent.split("\n")[0]
     const hasOldMeta = firstLine.includes("//META")
@@ -61,7 +59,6 @@ export default class AddonManager {
     const hasNewMeta = firstLine.includes("/**")
     if (hasNewMeta) return this.parseNewMeta(fileContent)
   }
-
   parseOldMeta(fileContent) {
     const meta = fileContent.split("\n")[0]
     const metaData = meta.substring(meta.lastIndexOf("//META") + 6, meta.lastIndexOf("*//"))

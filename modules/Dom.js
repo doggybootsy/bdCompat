@@ -48,4 +48,9 @@ export default class Dom {
     const scriptEle = document.getElementById(id)
     if (scriptEle) scriptEle.remove()
   }
+  // React ig
+  static getReactInstance(node) {
+    if (node.__reactInternalInstance$) return node.__reactInternalInstance$;
+    return node[Object.keys(node).find(k => k.startsWith("__reactInternalInstance") || k.startsWith("__reactFiber"))] || null;
+  }
 }
