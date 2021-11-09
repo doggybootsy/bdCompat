@@ -20,9 +20,7 @@ export default class Patcher {
   }
   static unpatchAll(patches) {
     if (typeof patches === "string") patches = this.getPatchesByCaller(patches)
-    for (const patch of patches) {
-      patch.unpatch()
-    }
+    for (const patch of patches) patch.unpatch()
   }
   static resolveModule(module) {
     if (!module || typeof(module) === "function" || (typeof(module) === "object" && !Array.isArray(module))) return module

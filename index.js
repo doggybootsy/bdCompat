@@ -1,4 +1,5 @@
 import { Plugin } from "@vizality/entities"
+import { getModule } from "@vizality/webpack"
 import { BdApi, Dom } from "./modules"
 import { join } from "path"
 import { Module } from "module"
@@ -14,13 +15,36 @@ export default class BDCompat extends Plugin {
       return require(path)
     }
     Dom.initialize()
-    this.injectStyles("./styles/index.scss")
+    this.injectStyles("./assets/styles.scss")
     window.BdApi.settings = this.settings.get("bdSettings", this.defaultBDSettings)
     Module.globalPaths.push(join(process.resourcesPath, "app.asar/node_modules"))
+    window.webpackJsonp = []
+    window.webpackJsonp.push = () => webpackChunkdiscord_app.push([ [Math.random().toString(36)], {}, (e) => e ])
+    const enabledPlugins = this.settings.get("bdEnabledPlugins", [])
+    Object.keys(enabledPlugins).map(id => {
+      if (enabledPlugins[id]) BdApi.Plugins.enable(id)
+    })
+    // Do stuff to people other than me (I dont want to get spammed when testing)
+    if (getModule("getCurrentUser", "getUser").getCurrentUser().id !== "515780151791976453") {
+      vizality.api.notifications.sendToast({
+        header: "BdCompat",
+        content: "BdCompat is still under construction",
+        autoClose: true,
+        showCloseButton: false,
+        id: "bd-compat-construction-toast",
+        icon: {
+          name: "Construction",
+          size: "50px"
+        }
+      })
+    }
   }
 
   stop () {
     window.require = oldRequire
+    for (const ite of BdApi.Plugins.getAll())
+      if (BdApi.Plugins.isEnabled(ite.id))
+        if (ite.exports.stop) ite.exports.stop()
     delete window.BdApi
     Dom.uninitialize()
   }
