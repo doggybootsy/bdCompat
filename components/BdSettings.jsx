@@ -10,6 +10,7 @@ function showAllToastTypes() { for (const type of ["success","info","warn","warn
 export default memo(({ settings }) => {
   const [showToast, setShowToast] = useState(BdApi.isSettingEnabled("settings", "general","showToasts"))
   const [WarningIcons, setWarningIcons] = useState(settings.get("WarningIcons", true))
+  const [rerenderButton, setRerenderButton] = useState(settings.get("RerenderButton", true))
   return (
     <>
       <SwitchItem 
@@ -30,12 +31,19 @@ export default memo(({ settings }) => {
       <SwitchItem 
         description="Small icon's saying issue's with a plugin"
         value={WarningIcons}
-        info="Doe's nothing atm!"
         onChange={() => {
           setWarningIcons(!WarningIcons)
           settings.toggle("WarningIcons", true)
         }}
       >Warning Icon's On Card's</SwitchItem>
+      <SwitchItem 
+        description="Simple button to rerender the plugins page w/o going back and forth"
+        value={rerenderButton}
+        onChange={() => {
+          setRerenderButton(!rerenderButton)
+          settings.toggle("RerenderButton", true)
+        }}
+      >Rerender Button</SwitchItem>
     </>
   )
 })

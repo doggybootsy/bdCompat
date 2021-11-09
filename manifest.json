@@ -4,5 +4,6 @@
   "description": "Adds support for BetterDiscord plugins",
   "author": "Doggybootsy (orig. intrnl & Juby210)",
   "icon": "assets/Icon.png",
-  "license": ""
+  "license": "",
+  "production": false
 }

@@ -1,5 +1,4 @@
 import { Plugin } from "@vizality/entities"
-import { getModule } from "@vizality/webpack"
 import { BdApi, Dom } from "./modules"
 import { join } from "path"
 import { Module } from "module"
@@ -21,14 +20,12 @@ export default class BDCompat extends Plugin {
     window.webpackJsonp = []
     window.webpackJsonp.push = () => webpackChunkdiscord_app.push([ [Math.random().toString(36)], {}, (e) => e ])
     const enabledPlugins = this.settings.get("bdEnabledPlugins", [])
-    Object.keys(enabledPlugins).map(id => {
-      if (enabledPlugins[id]) BdApi.Plugins.enable(id)
-    })
+    Object.keys(enabledPlugins).map(id => { if (enabledPlugins[id]) BdApi.Plugins.enable(id) })
     // Do stuff to people other than me (I dont want to get spammed when testing)
-    if (getModule("getCurrentUser", "getUser").getCurrentUser().id !== "515780151791976453") {
+    if (require("./manifest.json").production && !this.settings.get("shouldUnderConstructionToast", false)) {
       vizality.api.notifications.sendToast({
         header: "BdCompat",
-        content: "BdCompat is still under construction",
+        content: "BdCompat is still under construction. So EXPECT issues!",
         autoClose: true,
         showCloseButton: false,
         id: "bd-compat-construction-toast",
@@ -37,6 +34,7 @@ export default class BDCompat extends Plugin {
           size: "50px"
         }
       })
+      this.settings.toggle("shouldUnderConstructionToast", false)
     }
   }
 
