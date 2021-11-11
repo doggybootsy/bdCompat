@@ -21,7 +21,7 @@ export default class BDCompat extends Plugin {
     window.webpackJsonp.push = () => webpackChunkdiscord_app.push([ [Math.random().toString(36)], {}, (e) => e ])
     const enabledPlugins = this.settings.get("bdEnabledPlugins", [])
     Object.keys(enabledPlugins).map(id => { if (enabledPlugins[id]) BdApi.Plugins.enable(id) })
-    // Do stuff to people other than me (I dont want to get spammed when testing)
+    // Warning
     if (require("./manifest.json").production && !this.settings.get("shouldUnderConstructionToast", false)) {
       vizality.api.notifications.sendToast({
         header: "BdCompat",

@@ -10,12 +10,12 @@ const { openModal } = BdApi.findModuleByProps("openModal", "openModalLazy")
 export default memo(({ getSetting:get, updateSetting:set, toggleSetting:toggle }) => {
   const plugins = BdApi.Plugins.getAll()
   const display = vizality.api.settings._fluxProps("addon-manager").getSetting("listDisplay", "card")
-  const Card = require(`./Cards/${display}.jsx`).default
+  const Card = require(`./Cards/card.jsx`).default
   let imgNum = 0
   const PWI = ["GifSaver", "BDFDB"]
   const pluginPage = BdApi.Plugins.get(vizality.api.routes.getLocation().pathname.split("/").pop())
   // if page is to a bd plugin and if that plugin has a settings page, open that settings panel
-  if (pluginPage?.exports?.getSettingsPanel) openModal(props => <SettingsModal modalProps={props} Title={plugin.name}>{plugin.exports.getSettingsPanel()}</SettingsModal>)
+  if (pluginPage?.exports?.getSettingsPanel) openModal(props => <SettingsModal modalProps={props} Title={pluginPage.name}>Not showing so discord doesnt crash</SettingsModal>)
   let [num, setNum] = useState(0)
   function parents(element, selector = "") {
     const parents = [];

@@ -2,7 +2,9 @@ import React, { memo, useState } from "react"
 import { getModule, contextMenu } from "@vizality/webpack"
 import { LazyImage, OverflowTooltip, Icon, Anchor, Switch, ContextMenu } from "@vizality/components"
 import BdApi from "../../modules/BdApi"
+import SettingsModal from "../SettingsModal"
 
+const { openModal } = getModule("openModal", "openModalLazy")
 const Button = getModule("ButtonLooks")
 
 class Card extends React.Component {
@@ -15,13 +17,16 @@ class Card extends React.Component {
     function UninstallPlugin() {
       BdApi.showConfirmationModal(`Uninstall `, [`Are you sure you want to uninstall?`], {
         confirmText: "Uninstall",
-        onConfirm: () => BdApi.showToast("Atm uninstalling plugins doesnt exist", { type: "warning" })
+        onConfirm: () => {
+          BdApi.Plugins.getAll(true).addonsApi.deletePlugin(plugin)
+        }
       })
     }
     function OpenSettings() {
-      openModal(props => (
-        <SettingsModal modalProps={props} Title={plugin.name}> {plugin.exports.getSettingsPanel()} </SettingsModal>
-      ))
+      const Content = plugin.exports.getSettingsPanel()
+      console.log(Content);
+      try { openModal(props => <SettingsModal modalProps={props} Title={plugin.name}>Not showing so discord doesnt crash</SettingsModal>) }
+      catch (e) { console.log(e) }
     }
     function togglePlugin() {
       this.setState({ active: !this.state.active })
@@ -81,7 +86,7 @@ class Card extends React.Component {
                     <span className="vz-addon-card-version">{plugin.version}</span>
                   </div>
                   <OverflowTooltip className="vz-addon-card-author-wrapper" text={plugin.author}>
-                    {(plugin.authorLink == undefined || plugin.authorLink == "undefined") ? (
+                    {(!!plugin.authorLink || plugin.authorLink == "undefined") ? (
                       <Anchor 
                         type="user" 
                         userId={plugin?.authorId} 
@@ -115,7 +120,7 @@ class Card extends React.Component {
                     </Button.default>
                   </div>
                   <div className="vz-addon-card-footer-section-right">
-                    {(plugin.website !== undefined) && (
+                    {(!!plugin.website) && (
                       <div className="vz-addon-card-settings-button">
                         <Icon 
                           name="Globe"
@@ -125,7 +130,7 @@ class Card extends React.Component {
                         />
                       </div>
                     )}
-                    {(plugin.source !== undefined) && (
+                    {(!!plugin.source) && (
                       <div className="vz-addon-card-settings-button">
                         <Icon 
                           name="GitHub"
@@ -135,7 +140,7 @@ class Card extends React.Component {
                         />
                       </div>
                     )}
-                    {(plugin.invite !== undefined) && (
+                    {(!!plugin.invite) && (
                       <div className="vz-addon-card-settings-button">
                         <Icon 
                           name="HelpCircle"
@@ -145,7 +150,7 @@ class Card extends React.Component {
                         />
                       </div>
                     )}
-                    {(plugin.donate !== undefined) && (
+                    {(!!plugin.donate) && (
                       <div className="vz-addon-card-settings-button">
                         <Icon 
                           name="Store"
@@ -155,7 +160,7 @@ class Card extends React.Component {
                         />
                       </div>
                     )}
-                    {(plugin.patreon !== undefined) && (
+                    {(!!plugin.patreon) && (
                       <div className="vz-addon-card-settings-button">
                         <Icon 
                           name="Chest"

@@ -1,19 +1,29 @@
-import { readdir, existsSync, readFileSync, mkdirSync } from "fs"
+import { readdir, existsSync, readFileSync, mkdirSync, unlinkSync, watch } from "fs"
 import { join } from "path"
 import BdApi from "./BdApi"
 
-export const Addons = new class {
+const Addons = new class {
   constructor() {
-    this.addons = []
+    this.addons = {"plugins": [], "paths": {}}
     this.loadAddons()
   }
   get settings() { return vizality.manager.plugins.get("bd-compat").settings }
+  get pluginDir() { return join(__dirname, "..", "plugins") }
+
   setEnable(plugin, val) {
     let enabledPlugins = this.settings.get("enabledPlugins", {})
     enabledPlugins[plugin] = val
     this.settings.set("enabledPlugins", enabledPlugins)
   }
-  getIsEnabled(plugin) { return this.settings.get("enabledPlugins", {})[plugin] || undefined }
+  getIsEnabled(plugin) { return this.settings.get("enabledPlugins", {})[plugin] }
+
+  deletePlugin(plugin) {
+    if (this.getIsEnabled(plugin.id) && plugin.exports.stop) plugin.exports.stop()
+    this.setEnable(plugin.id, false)
+    unlinkSync(this.addons.paths[plugin.id])
+    BdApi.showToast(`Deleted ${plugin.id}`, {type: "success"})
+    this.loadAddons()
+  }
   // Meta
   extractMeta(content) {
     const firstLine = content.split("\n")[0]
@@ -52,37 +62,43 @@ export const Addons = new class {
   }
   // Addon
   loadAddons() {
-    if (!existsSync(join(__dirname, "..", "plugins"))) mkdirSync(join(__dirname, "..", "plugins"))
-    readdir(join(__dirname, "..", "plugins"), (errRD, files) => {
-      if (errRD) throw errRD
-      for (const file of files) {
-        if (file.endsWith(".plugin.js")) {
-          const path = join(__dirname, "..", "plugins", file)
-          const content = readFileSync(path, "utf8")
-          const meta = this.extractMeta(content)
-          const exports = require(path)
-          meta["exports"] = new exports()
-          // Add missing info/add the get<Thing>
-          if (meta.exports.getName) meta["name"] = meta.exports.getName()
-          if (meta["name"] === undefined || meta["name"] === "undefined") meta["name"] = file.replace(".plugin.js", "")
-          if (meta.exports.getVersion) meta["version"] = meta.exports.getVersion()
-          if (meta["version"] === undefined || meta["version"] === "undefined") meta["name"] = "???"
-          if (meta.exports.getAuthor) meta["author"] = meta.exports.getAuthor()
-          if (meta["author"] === undefined || meta["author"] === "undefined") meta["author"] = "???"
-          if (meta.exports.getDescription) meta["description"] = meta.exports.getDescription()
-          if (meta["description"] === undefined || meta["description"] === "undefined") meta["description"] = ""
-          if (!meta["id"]) meta["id"] = meta.name
-          if (this.getIsEnabled(meta.id) === undefined) this.setEnable(meta.id, false)
-          this.addons.push(meta)
-          if (meta.exports.load) meta.exports.load()
+    try {
+      if (!existsSync(this.pluginDir)) mkdirSync(this.pluginDir)
+      readdir(this.pluginDir, (errRD, files) => {
+        if (errRD) throw errRD
+        for (const file of files) {
+          if (file.endsWith(".plugin.js")) {
+            const path = join(__dirname, "..", "plugins", file)
+            const content = readFileSync(path, "utf8")
+            const meta = this.extractMeta(content)
+            const exports = require(path)
+            meta["exports"] = new exports()
+            // Add missing info/add the get<Thing>
+            if (meta.exports.getName) meta["name"] = meta.exports.getName()
+            if (meta["name"] === undefined || meta["name"] === "undefined") meta["name"] = file.replace(".plugin.js", "")
+            if (meta.exports.getVersion) meta["version"] = meta.exports.getVersion()
+            if (meta["version"] === undefined || meta["version"] === "undefined") meta["name"] = "???"
+            if (meta.exports.getAuthor) meta["author"] = meta.exports.getAuthor()
+            if (meta["author"] === undefined || meta["author"] === "undefined") meta["author"] = "???"
+            if (meta.exports.getDescription) meta["description"] = meta.exports.getDescription()
+            if (meta["description"] === undefined || meta["description"] === "undefined") meta["description"] = ""
+            if (!meta["id"]) meta["id"] = meta.name
+            if (this.getIsEnabled(meta.id) === undefined) this.setEnable(meta.id, false)
+            this.addons.plugins.push(meta)
+            this.addons.paths[meta.id] = path
+            if (meta.exports.load) meta.exports.load()
+          }
         }
-      }
-    })
+      })
+    } 
+    catch (error) {
+      console.log(error);
+    }
   }
 }
 
 export default new class {
-  get folder() { return join(__dirname, "..", "plugins") }
+  get folder() { return Addons.pluginDir }
   isEnabled(idOrAddon) { 
     let data = Addons.getIsEnabled(idOrAddon)
     if (data === undefined) data = false
@@ -102,6 +118,9 @@ export default new class {
   }
   toggle(idOrAddon) { return this.isEnabled(idOrAddon) ? this.disable(idOrAddon) : this.enable(idOrAddon) }
   reload(idOrFileOrAddon) { return this.disable(idOrFileOrAddon), this.enable(idOrFileOrAddon) }
-  get(idOrFile) { return Addons.addons.filter(m => m.name === idOrFile)[0] }
-  getAll() { return Addons.addons }
+  get(idOrFile) { return Addons.addons.plugins.filter(m => m.id === idOrFile)[0] }
+  getAll(paths) { return paths ? {
+    paths: Addons.addons.paths,
+    addonsApi: Addons
+  } : Addons.addons.plugins }
 }
